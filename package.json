@@ -1,0 +1,63 @@
+{
+  "name": "360ace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "360ace unified consultancy hub",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:ci": "playwright test --reporter=list",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.3.0",
+    "@vercel/og": "^0.8.5",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.22",
+    "lucide-react": "^0.544.0",
+    "next": "^15.5.4",
+    "next-secure-headers": "^2.2.0",
+    "next-themes": "^0.4.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-hook-form": "^7.64.0",
+    "tailwind-merge": "^3.3.1",
+    "three": "^0.180.0",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "@next/eslint-plugin-next": "^15.5.4",
+    "@playwright/test": "^1.55.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/node": "^20.17.10",
+    "@types/react": "^19.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "autoprefixer": "^10.4.20",
+    "critters": "^0.0.23",
+    "eslint": "^9.13.0",
+    "eslint-config-next": "^15.5.4",
+    "globals": "^16.4.0",
+    "lighthouse-ci": "^1.13.1",
+    "playwright": "^1.55.1",
+    "postcss": "^8.4.49",
+    "prettier": "^3.4.2",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=10.0.0"
+  }
+}

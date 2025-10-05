@@ -1,0 +1,25 @@
+:root {
+  --brand-hue: 152;
+  --brand-primary: var(--brand-hue) 65% 45%;
+  --brand-accent: 32 90% 55%;
+  --brand-tech: 207 82% 46%;
+  --brand-food: 96 59% 45%;
+  --brand-surface: var(--brand-hue) 30% 97%;
+  --brand-foreground: 200 20% 18%;
+  --brand-muted: 200 10% 40%;
+
+  --radius-xl: 2.5rem;
+  --radius-lg: 1.25rem;
+  --radius-md: 0.75rem;
+
+  --shadow-soft: 0 20px 40px -24px hsl(var(--brand-primary) / 0.35);
+
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, monospace;
+}
+
+.dark {
+  --brand-surface: var(--brand-hue) 22% 10%;
+  --brand-foreground: var(--brand-hue) 45% 96%;
+  --brand-muted: var(--brand-hue) 35% 70%;
+}
