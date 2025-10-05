@@ -1,0 +1,43 @@
+:root {
+  --brand-hue: 152;
+  --brand-saturation: 66%;
+  --brand-lightness: 45%;
+  --brand-50: var(--brand-hue) 78% 96%;
+  --brand-100: var(--brand-hue) 72% 90%;
+  --brand-200: var(--brand-hue) 70% 82%;
+  --brand-300: var(--brand-hue) 68% 72%;
+  --brand-400: var(--brand-hue) 66% 62%;
+  --brand-500: var(--brand-hue) 66% 45%;
+  --brand-600: var(--brand-hue) 58% 38%;
+  --brand-700: var(--brand-hue) 52% 32%;
+  --brand-800: var(--brand-hue) 48% 26%;
+  --brand-900: var(--brand-hue) 40% 20%;
+  --tech-color: 210 90% 56%;
+  --food-color: 32 92% 54%;
+  --neutral-900: 222 47% 11%;
+  --neutral-700: 217 20% 35%;
+  --neutral-500: 215 16% 47%;
+  --neutral-300: 214 32% 91%;
+  --neutral-100: 214 42% 96%;
+  --neutral-50: 210 40% 98%;
+  --brand-gradient: linear-gradient(135deg, hsl(var(--brand-400)) 0%, hsl(var(--brand-500)) 50%, hsl(var(--brand-600)) 100%);
+  --brand-grid: radial-gradient(circle at 1px 1px, hsl(var(--brand-300) / 0.35) 1px, transparent 0);
+
+  --font-sans: "Inter", "Helvetica Neue", Arial;
+  --font-display: "Clash Display", "Inter", sans-serif;
+  --font-mono: "Fira Code", "SFMono-Regular";
+
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 2rem;
+  --shadow-soft: 0 10px 40px hsl(var(--brand-900) / 0.15);
+}
+
+[data-theme="dark"] {
+  --neutral-900: 210 18% 8%;
+  --neutral-700: 213 18% 18%;
+  --neutral-500: 217 11% 65%;
+  --neutral-300: 215 20% 24%;
+  --neutral-100: 218 22% 12%;
+  --neutral-50: 220 23% 16%;
+}

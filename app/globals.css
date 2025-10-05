@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "../styles/tokens.css";
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html {
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  background-color: hsl(var(--neutral-50));
+}
+
+body {
+  color: hsl(var(--neutral-900));
+  background: hsl(var(--neutral-50));
+  min-height: 100vh;
+}
+
+.dark body {
+  background: hsl(var(--neutral-900));
+  color: hsl(var(--neutral-50));
+}
+
+a {
+  @apply underline-offset-4 transition-colors;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-soft), var(--shadow-soft);
+}
+
+::-moz-selection {
+  background: hsl(var(--brand-400));
+  color: white;
+}
+
+::selection {
+  background: hsl(var(--brand-400));
+  color: white;
+}
+
+[data-grid="true"] {
+  background-image: var(--brand-grid);
+}
+
+.reduced-motion * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
