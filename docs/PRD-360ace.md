@@ -1,10 +1,10 @@
 # Product Requirements Document (PRD) — 360ace.net Compound Consultancy
 
 ## Project Title
-360ace — Unified Consultancy Website (Tech + Food) on Next.js
+360ace — Unified Consultancy Hub (Tech + Food) on Next.js
 
 ## Objective
-Create a single, modern website for 360ace that unifies 360ace‑Tech and 360ace‑Food as consultancy offerings under the 360ace brand. The site should provide a premium, credible, and high‑performance experience, support rich content, and enable rapid iteration with a strong CI/CD pipeline.
+Build a single 360ace.net hub that spotlights both consultancy practices (360ace‑Tech and 360ace‑Food) and routes visitors to the dedicated practice sites for deep content and engagement. No blog/insights merge on the hub. The hub focuses on brand story, value, and a clear comparison of the two practices with strong CTAs linking to each practice.
 
 ## Brand & Theme
 - Brand: Use the existing 360ace.net color theme and visual language as the foundation.
@@ -30,37 +30,36 @@ Create a single, modern website for 360ace that unifies 360ace‑Tech and 360ace
 
 ## Information Architecture
 - Primary
-  - Home (`/`)
-  - Consulting (`/consulting`)
-    - Tech (`/consulting/tech`): services, differentiators, process, testimonials
-    - Food (`/consulting/food`): services, differentiators, process, testimonials
-  - Insights (`/insights`): unified blog/case studies with tags and filters (e.g., Tech, Food)
-  - About (`/about`): company, team, mission, brand promise
-  - Contact (`/contact`): inquiry form, optional scheduling widget
-  - Legal (`/legal/privacy`, `/legal/terms`)
-- Secondary
-  - Case studies (optional phase): `/insights/case-studies/[slug]`
-  - Services detail pages (optional): `/services/[slug]`
-  - RSS feed: `/rss.xml`
+  - Home (`/`): umbrella landing combining highlights of Tech and Food practices.
+  - Consulting (`/consulting`): optional overview page summarizing both practices with outbound links.
+  - About (`/about`): company overview and brand promise (optional phase).
+  - Contact (`/contact`): central inquiry with routing options.
+  - Legal (`/legal/privacy`, `/legal/terms`).
+- Link‑out strategy
+  - Tech deep dives → https://360ace.tech
+  - Food deep dives → https://360ace.food
+  - No Insights/Blog pages on the hub.
 
 ## Content Strategy
-- Merge existing Tech blog posts (Markdown/MDX in `360ace-Tech/content/blog`) and Food resources (`360ace-Food/content`) into a single content system (Contentlayer2 + MDX + JSON as needed).
-- Apply consistent frontmatter: `title`, `date`, `author`, `tags`, `summary`, `hero`, `draft`, `canonical`.
-- Tag taxonomy: `tech`, `food`, `devops`, `cloud`, `quality-assurance`, etc. Enable filtering, related posts, and per‑tag pages.
-- Content templates:
-  - Blog post (MD/MDX) with ToC, code highlighting, callouts.
-  - Case study (metrics, problem → solution → impact, quotes, CTA).
-  - Service page sections (hero, features, FAQs, CTAs).
+- Do not merge blogs/insights. Editorial content remains on practice sites.
+- Hub copy is concise and sourced from practice landing pages:
+  - 360ace‑Tech: Services, Process, Differentiators, Testimonials, CTA themes.
+  - 360ace‑Food: Hero tone, Trusted logos/stats, Services Grid, Process Timeline, Expertise, Testimonials.
+- Use short blurbs and bullet highlights with clear “Explore Tech” / “Explore Food” CTAs.
 
 ## Functional Requirements
-- Global navigation with clear Consulting split (Tech, Food) and strong CTAs.
-- Home page: unified hero (brand‑level), value prop, combined offerings overview with links to Tech/Food.
-- Consulting pages (Tech, Food): service clusters, differentiators, process timeline, testimonials, CTA band.
-- Insights hub: search, tags, filters; per‑post pages with SEO metadata and social share cards; RSS feed.
-- Contact form: client + server validation (Zod), spam protection (hCaptcha/reCAPTCHA or honeypot + rate limit), email notification.
-- Theming: brand tokens; light/dark mode; respects `prefers-reduced-motion`.
-- Motion/3D: tasteful hero and micro‑interactions; graceful fallbacks; lazy/dynamic loading.
-- Accessibility: skip links, focus management, keyboard nav, contrast compliance.
+- Navigation with two primary CTAs: Explore Tech and Explore Food.
+- Home page modules:
+  - Brand hero (umbrella) with two clear paths (Tech, Food).
+  - “What we do” snapshot for each practice.
+    - Tech: Cloud Architecture & Migration, DevOps/SRE, IaC, Platform Engineering/Kubernetes, Observability, Security.
+    - Food: Training & Capability, Quality Systems, Regulatory & Audit Readiness, QA Partnerships, Research & Product Development, Conference/Insight Support.
+  - Unified process (Assess → Design → Implement → Monitor → Elevate).
+  - Credibility band: Differentiators + Trusted‑By/Stats.
+  - Short testimonials and final CTA band.
+- All deep links route to practice sites (360ace.tech / 360ace.food).
+- Central contact form with server validation and optional practice routing.
+- Theming/motion/a11y as per brand standards.
 
 ## Non‑Functional Requirements
 - Performance budgets (p75 mobile): LCP < 2.5s, CLS < 0.1, TBT < 200ms.
@@ -70,16 +69,13 @@ Create a single, modern website for 360ace that unifies 360ace‑Tech and 360ace
 - Privacy: cookie‑less analytics by default (e.g., Vercel Analytics/Plausible); GDPR friendly.
 
 ## Technical Architecture (Recommended)
-- Framework: Next.js (latest stable, App Router, RSC) + TypeScript strict mode.
-- Styling & Design System: Tailwind CSS + shadcn/ui (Radix primitives); Tailwind Variants (CVA) for component variants; CSS variables for theme tokens.
-- Motion: Framer Motion for page transitions and micro‑interactions; GSAP/ScrollTrigger optional for complex scroll‑driven sequences.
-- 3D: React Three Fiber + drei for subtle hero visuals; feature‑flag with reduced‑motion handling.
-- Content: MDX + Contentlayer2; images under `public/` and rendered via `next/image`.
-- Search: FlexSearch client‑side initially; adapter path for Algolia/Typesense if needed.
-- Forms: Route Handlers, Zod validation, anti‑spam, email via Resend/SendGrid (env‑based).
-- SEO: Next metadata API + JSON‑LD helpers; dynamic OG images via `@vercel/og`.
-- Testing/QA: Vitest/Jest + Testing Library; Playwright E2E; Lighthouse CI budgets; ESLint + Prettier; typecheck in CI.
-- Delivery: Vercel (previews, ISR/Edge); Renovate/Dependabot; Changesets for versioned components if extracted.
+- Framework: Next.js (App Router, RSC) + TypeScript strict.
+- Styling & Design System: Tailwind CSS + shadcn/ui (Radix) + CVA; CSS variables for theme tokens.
+- Motion/3D: Framer Motion; optional R3F hero with graceful fallbacks.
+- Content: No blog/insights in hub. Use local JSON/TS content for homepage modules; images via `next/image`.
+- Forms: Route Handlers + Zod; anti‑spam; email via provider.
+- SEO: Metadata API + JSON‑LD (`Organization`, `WebSite`); outbound link strategy; avoid duplicate canonicals.
+- QA/CI: ESLint/Prettier, typecheck, Playwright smoke, Lighthouse CI; Vercel previews.
 
 ## Library Options (evaluate; pick best‑fit)
 - UI/Design Systems: shadcn/ui, Radix UI, Tailwind CSS, MUI, Chakra UI, HeroUI, Once UI, Storybook (docs).
@@ -101,11 +97,10 @@ Create ADRs in `docs/adr/` for each major decision. At minimum:
 Each ADR includes: problem, options, decision, rationale, performance/a11y impacts, date. Re‑validate before build freeze.
 
 ## Migration Plan
-- 360ace‑Tech: migrate `content/blog` and any reusable components (layout, navigation, templates) after code review and adaptation to shared design system.
-- 360ace‑Food: migrate `content/*.json` schema and MDX, mapping to unified `content/` models. Convert JSON to TypeScript types; keep authoring flow simple.
-- 360ace static site: extract brand tokens, images, and any copy worth keeping; add redirects if legacy URLs exist.
-- Images: relocate to `public/` with consistent paths; optimize (WebP/AVIF), add LQIP if valuable.
-- Redirects: preserve backlinks; canonicalize new slugs.
+- No merge of blogs or insights.
+- Extract brand tokens and any reusable visuals only.
+- Define outbound links from hub modules to specific destinations on 360ace.tech and 360ace.food.
+- Add redirects only for legacy hub URLs if needed.
 
 ## Accessibility & UX Principles
 - Motion respect: honor `prefers-reduced-motion`; add a visible motion toggle.
@@ -113,9 +108,9 @@ Each ADR includes: problem, options, decision, rationale, performance/a11y impac
 - Navigation: consistent sticky header; logical tab order; focus traps only when needed; skip‑to‑content.
 
 ## SEO & Social
-- Per‑page meta and Open Graph; dynamic OG image generation.
-- JSON‑LD for organization, breadcrumbs, blog posts, and (optionally) services.
-- RSS/Atom feed for Insights.
+- Per‑page meta and Open Graph for hub pages.
+- JSON‑LD for organization and website; no blog schema on hub.
+- No RSS/Atom on hub; sitemaps for hub pages only.
 
 ## Security & Privacy
 - Security headers: CSP (with nonces), Frame‑Ancestors, Referrer‑Policy, Permissions‑Policy, HSTS (at edge/platform).
@@ -127,19 +122,17 @@ Each ADR includes: problem, options, decision, rationale, performance/a11y impac
 - CI checks: lint, typecheck, unit, E2E smoke, Lighthouse CI with budgets.
 - Deploy: Vercel for previews and production. Secrets via platform envs.
 
-## Agents & Responsibilities (can be parallelized)
-- UI Agent: design tokens, components, shadcn/ui integration, Storybook docs.
-- UX Agent: IA, nav flows, forms, copy hierarchy, reduced‑motion experience.
-- Motion/3D Agent: page transitions, micro‑interactions, R3F scene optimization, fallbacks.
-- Content Agent: migration, templates, taxonomy, metadata quality.
-- SEO Agent: metadata, JSON‑LD, robots/sitemaps, internal linking; validates in CI.
+- UI Agent: tokens, components, shadcn/ui integration, Storybook docs.
+- UX Agent: IA, nav flows, copy hierarchy, reduced‑motion experience.
+- Motion/3D Agent: transitions, micro‑interactions, hero effects + fallbacks.
+- Content Agent: curate succinct hub copy from practice landings; ensure accuracy of outbound links.
+- SEO Agent: metadata, JSON‑LD, robots/sitemaps; cross‑site linking strategy; validates in CI.
 - QA Agent: Playwright/Lighthouse pipelines, a11y audits, cross‑browser checks.
-- Each agent must research best practices at their stage, document ADRs, and validate changes via dev runs/builds. No mistakes; fix all errors before merge.
+- Each agent researches best practices, documents ADRs, and validates via dev runs/builds.
 
 ## Acceptance Criteria (Launch‑ready)
 - All success metrics targets met or exceeded.
 - Navigation and flows validated on mobile/desktop and screen readers.
-- Insights content migrated; tag pages working; RSS generated.
+- Hub homepage accurately reflects both practices; all deep links route to practice sites.
 - Contact form works with server validation and email delivery in staging.
 - CI/CD green on all required checks; preview/UAT sign‑off complete.
-
