@@ -23,7 +23,7 @@ export function HeroSection() {
   const { reduceMotion } = usePreferences();
 
   return (
-    <section className="relative overflow-hidden bg-[color:var(--color-background)]">
+    <section id="home" className="relative overflow-hidden bg-[color:var(--color-background)] scroll-mt-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-24 pt-20 sm:px-6 lg:flex-row lg:items-center">
         <div className="flex-1 space-y-6">
           <p className="text-sm uppercase tracking-[0.6em] text-[color:var(--color-muted-foreground)]">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TransitionLink } from "@/components/ui/transition-link";
 
 import { Button } from "@/components/ui/button";
 import { callToAction } from "@/lib/hub-content";
@@ -14,10 +15,10 @@ export function CallToActionSection() {
         <p className="mt-4 text-lg text-[color:var(--color-muted-foreground)]">{callToAction.description}</p>
         <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
           <Button asChild size="lg">
-            <Link href={callToAction.primaryCta.href}>{callToAction.primaryCta.label}</Link>
+            <TransitionLink href={callToAction.primaryCta.href}>{callToAction.primaryCta.label}</TransitionLink>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link href={callToAction.secondaryCta.href}>{callToAction.secondaryCta.label}</Link>
+            <TransitionLink href={callToAction.secondaryCta.href}>{callToAction.secondaryCta.label}</TransitionLink>
           </Button>
         </div>
       </div>

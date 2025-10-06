@@ -1,31 +1,30 @@
 import type { MetadataRoute } from "next";
-
-const baseUrl = "https://360ace.net";
+import site from "@/content/site.json" assert { type: "json" };
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: `${baseUrl}/`,
+      url: `${site.baseUrl}/`,
       changeFrequency: "monthly",
       priority: 1,
     },
     {
-      url: `${baseUrl}/consulting`,
+      url: `${site.baseUrl}/consulting`,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/contact`,
+      url: `${site.baseUrl}/contact`,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/legal/privacy`,
+      url: `${site.baseUrl}/legal/privacy`,
       changeFrequency: "yearly",
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/legal/terms`,
+      url: `${site.baseUrl}/legal/terms`,
       changeFrequency: "yearly",
       priority: 0.5,
     },

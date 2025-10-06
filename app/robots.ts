@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import site from "@/content/site.json" assert { type: "json" };
 
 export default function robots(): MetadataRoute.Robots {
-  const host = "https://360ace.net";
+  const host = site.baseUrl;
 
   return {
     rules: {

@@ -2,7 +2,7 @@ import { unifiedProcess } from "@/lib/hub-content";
 
 export function ProcessSection() {
   return (
-    <section className="py-20">
+    <section id="process" className="py-20 scroll-mt-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6">
         <div className="max-w-2xl space-y-4">
           <p className="text-sm uppercase tracking-[0.5em] text-[color:var(--color-muted-foreground)]">

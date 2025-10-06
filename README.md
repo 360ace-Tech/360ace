@@ -6,7 +6,7 @@ A Next.js 15 (App Router) experience that introduces the unified 360ace consulta
 - Next.js 15 with the App Router and Turbopack dev server
 - TypeScript (strict), Tailwind CSS v4 tokens, custom design system primitives
 - shadcn-inspired UI components using `class-variance-authority`
-- Framer Motion (hero micro-interactions) with `prefers-reduced-motion` support
+- Framer Motion (hero micro-interactions); motion toggle removed, animations enabled by default
 - React Hook Form + Zod validation for the contact workflow
 
 ## Local Development
@@ -34,16 +34,24 @@ components/
   sections/                # Home page sections
   forms/                   # Contact form
   ui/                      # Button, inputs, toggles
+content/
+  hub.json                 # Editable site content (hero, sections, CTAs)
+  site.json                # Title/description/base URL for metadata
 lib/
-  hub-content.ts           # Curated copy for the hub modules
+  hub-content.ts           # Typed exports sourced from content/hub.json
 styles/
   tokens.css               # Brand color + typography tokens
 ```
 
+## Editing Content
+- Update `content/hub.json` to change homepage copy, practice highlights, process, testimonials, and CTAs.
+- Update `content/site.json` to change the global site title, description, and base URL.
+- No code changes are required; components read from these JSON files.
+
 ## Environment & Deployment
 - Configure email delivery for the contact route via environment variables when connecting Resend/SendGrid.
 - Add security headers (CSP, Permissions-Policy, Referrer-Policy) via your hosting platform (e.g., Vercel middleware).
-- Update `metadataBase` in `app/layout.tsx` if the production hostname changes.
+- Update `content/site.json` `baseUrl` if the production hostname changes.
 
 ## Roadmap
 - Expand shadcn/ui component coverage and Storybook documentation

@@ -33,6 +33,12 @@
     display: block;
   }
 
+  /* Logo theme switching via data attribute */
+  .logo-dark { display: none; }
+  [data-theme="dark"] .logo-dark { display: inline; }
+  [data-theme="dark"] .logo-light { display: none; }
+  [data-theme="light"] .logo-light { display: inline; }
+
   ::selection {
     background: hsl(var(--hue-brand) 72% 36% / 0.2);
     color: var(--color-foreground);
@@ -47,5 +53,12 @@
   .focus-ring {
     outline: none;
     box-shadow: 0 0 0 3px hsl(var(--hue-brand) 70% 48% / 0.45);
+  }
+}
+
+/* Improve anchor scrolling with sticky header */
+@layer base {
+  section[id] {
+    scroll-margin-top: 80px;
   }
 }

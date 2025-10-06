@@ -1,19 +1,17 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ViewTransitions } from "next-view-transitions";
 
 import { SiteShell } from "@/components/layout/site-shell";
-
-const siteTitle = "360ace — Unified Consultancy Hub";
-const siteDescription =
-  "Strategic technology and food systems consultancy under one 360ace hub. Explore the practices and connect with experts.";
+import site from "@/content/site.json" assert { type: "json" };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://360ace.net"),
+  metadataBase: new URL(site.baseUrl),
   title: {
-    default: siteTitle,
+    default: site.title,
     template: "%s | 360ace",
   },
-  description: siteDescription,
+  description: site.description,
   keywords: [
     "360ace",
     "consultancy",
@@ -24,8 +22,8 @@ export const metadata: Metadata = {
     "platform engineering",
   ],
   openGraph: {
-    title: siteTitle,
-    description: siteDescription,
+    title: site.title,
+    description: site.description,
     url: "https://360ace.net",
     siteName: "360ace",
     locale: "en_US",
@@ -35,6 +33,15 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" }
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -43,10 +50,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="antialiased">
-        <SiteShell>{children}</SiteShell>
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="en" suppressHydrationWarning>
+        <body className="antialiased">
+          <SiteShell>{children}</SiteShell>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

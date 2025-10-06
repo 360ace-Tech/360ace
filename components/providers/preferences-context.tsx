@@ -47,9 +47,8 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
     const initialTheme = storedTheme ?? getSystemTheme();
     setThemeState(initialTheme);
 
-    const storedMotion = window.localStorage.getItem(MOTION_STORAGE_KEY);
-    const initialMotion = storedMotion ? storedMotion === "true" : getSystemReduceMotion();
-    setReduceMotionState(initialMotion);
+    // Always enable motion by default and ignore system/user reduced-motion preferences
+    setReduceMotionState(false);
   }, []);
 
   useEffect(() => {
