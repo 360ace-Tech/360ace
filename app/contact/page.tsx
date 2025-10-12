@@ -1,13 +1,7 @@
-import type { Metadata } from "next";
+"use client";
+
 import PageWrapper from "@/components/layout/page-wrapper";
-
 import { ContactForm } from "@/components/forms/contact-form";
-
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Start a conversation with 360ace about technology consulting, food systems quality, or combined programs.",
-};
 
 export default function ContactPage() {
   return (

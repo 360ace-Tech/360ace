@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import Link from "next/link";
+import { useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { usePreferences } from "@/components/providers/preferences-context";
@@ -19,23 +20,73 @@ const orbitVariants: Variants = {
   },
 };
 
+const containerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
 export function HeroSection() {
   const { reduceMotion } = usePreferences();
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Parallax effect for the visual element
+  const visualY = useTransform(scrollYProgress, [0, 1], [0, -50]);
+  const visualScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+  const visualOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <section id="home" className="relative overflow-hidden bg-[color:var(--color-background)] scroll-mt-24">
+    <section ref={sectionRef} id="home" className="relative overflow-hidden bg-[color:var(--color-background)] scroll-mt-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-24 pt-20 sm:px-6 lg:flex-row lg:items-center">
-        <div className="flex-1 space-y-6">
-          <p className="text-sm uppercase tracking-[0.6em] text-[color:var(--color-muted-foreground)]">
+        <motion.div
+          className="flex-1 space-y-6"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          <motion.p
+            variants={itemVariants}
+            className="text-sm uppercase tracking-[0.6em] text-[color:var(--color-muted-foreground)]"
+          >
             {hero.eyebrow}
-          </p>
-          <h1 className="text-balance text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+          </motion.p>
+          <motion.h1
+            variants={itemVariants}
+            className="text-balance text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl"
+          >
             {hero.title}
-          </h1>
-          <p className="max-w-xl text-lg text-[color:var(--color-muted-foreground)]">
+          </motion.h1>
+          <motion.p
+            variants={itemVariants}
+            className="max-w-xl text-lg text-[color:var(--color-muted-foreground)]"
+          >
             {hero.description}
-          </p>
-          <div className="flex flex-col gap-4 sm:flex-row">
+          </motion.p>
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col gap-4 sm:flex-row"
+          >
             <Button asChild size="lg" className="bg-[color:var(--color-tech)] text-white hover:bg-[color:var(--color-tech)]/90">
               <Link href={hero.techCta.href} target="_blank" rel="noreferrer">
                 {hero.techCta.label}
@@ -46,9 +97,16 @@ export function HeroSection() {
                 {hero.foodCta.label}
               </Link>
             </Button>
-          </div>
-        </div>
-        <div className="relative flex flex-1 items-center justify-center">
+          </motion.div>
+        </motion.div>
+        <motion.div
+          className="relative flex flex-1 items-center justify-center"
+          style={reduceMotion ? {} : {
+            y: visualY,
+            scale: visualScale,
+            opacity: visualOpacity,
+          }}
+        >
           <div className="relative h-[320px] w-[320px] rounded-full bg-gradient-to-br from-[color:var(--color-tech-soft)] via-white to-[color:var(--color-food-soft)] shadow-[var(--shadow-lg)]">
             {!reduceMotion && (
               <motion.div
@@ -68,7 +126,7 @@ export function HeroSection() {
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

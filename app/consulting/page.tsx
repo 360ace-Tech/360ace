@@ -1,14 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import PageWrapper from "@/components/layout/page-wrapper";
 
 import { Button } from "@/components/ui/button";
 import { practiceHighlights } from "@/lib/hub-content";
-
-export const metadata = {
-  title: "Consulting Practices",
-  description:
-    "Explore the two consultancy practices powering 360ace: technology and food systems expertise with shared delivery standards.",
-};
 
 export default function ConsultingPage() {
   return (

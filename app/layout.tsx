@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ViewTransitions } from "next-view-transitions";
 
 import { SiteShell } from "@/components/layout/site-shell";
 import site from "@/content/site.json" assert { type: "json" };
@@ -50,12 +49,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ViewTransitions>
-      <html lang="en" suppressHydrationWarning>
-        <body className="antialiased">
-          <SiteShell>{children}</SiteShell>
-        </body>
-      </html>
-    </ViewTransitions>
+    <html lang="en" suppressHydrationWarning>
+      <body className="antialiased">
+        <SiteShell>{children}</SiteShell>
+      </body>
+    </html>
   );
 }
