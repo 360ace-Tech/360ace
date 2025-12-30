@@ -58,7 +58,7 @@ export function HeroSection() {
 
   return (
     <section ref={sectionRef} id="home" className="relative overflow-hidden bg-[color:var(--color-background)] scroll-mt-24">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-24 pt-20 sm:px-6 lg:flex-row lg:items-center">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-16 pt-14 sm:px-6 lg:flex-row lg:items-center lg:pb-24 lg:pt-20">
         <motion.div
           className="flex-1 space-y-6"
           initial="hidden"
@@ -100,14 +100,14 @@ export function HeroSection() {
           </motion.div>
         </motion.div>
         <motion.div
-          className="relative flex flex-1 items-center justify-center"
+          className="relative hidden flex-1 items-center justify-center md:flex"
           style={reduceMotion ? {} : {
             y: visualY,
             scale: visualScale,
             opacity: visualOpacity,
           }}
         >
-          <div className="relative h-[320px] w-[320px] rounded-full bg-gradient-to-br from-[color:var(--color-tech-soft)] via-white to-[color:var(--color-food-soft)] shadow-[var(--shadow-lg)]">
+          <div className="relative h-[360px] w-[360px] rounded-full bg-gradient-to-br from-[color:var(--color-tech-soft)] via-[color:var(--color-secondary)] to-[color:var(--color-food-soft)] shadow-[var(--shadow-lg)]">
             {!reduceMotion && (
               <motion.div
                 className="absolute inset-[-18%] rounded-full border border-dashed border-[color:var(--color-primary)]/50"

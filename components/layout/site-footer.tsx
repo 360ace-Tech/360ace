@@ -12,6 +12,7 @@ const practiceLinks = [
 ];
 
 export function SiteFooter() {
+  const year = new Date().getUTCFullYear();
   return (
     <footer className="border-t border-[color:var(--color-border)] bg-[color:var(--color-muted)]/40 py-12">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6">
@@ -59,7 +60,9 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="flex flex-col gap-2 text-xs text-[color:var(--color-muted-foreground)] sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {new Date().getFullYear()} 360ace Tech Inc. All rights reserved.</p>
+          <p>
+            &copy; <time dateTime={`${year}`} suppressHydrationWarning>{year}</time> 360ace Tech Inc. All rights reserved.
+          </p>
           <p>Built with respect for accessibility, privacy, and measurable impact.</p>
         </div>
       </div>

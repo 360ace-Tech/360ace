@@ -3,6 +3,7 @@ import "./globals.css";
 
 import { SiteShell } from "@/components/layout/site-shell";
 import site from "@/content/site.json" assert { type: "json" };
+import { inter, plexMono } from "./fonts";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.baseUrl),
@@ -28,9 +29,19 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    site: "@360ace",
+    creator: "@360ace",
+    title: site.title,
+    description: site.description,
+  },
   robots: {
     index: true,
     follow: true,
+  },
+  alternates: {
+    canonical: "/",
   },
   icons: {
     icon: [
@@ -50,7 +61,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased">
+      <body className={`${inter.variable} ${plexMono.variable} antialiased`}>
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

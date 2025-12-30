@@ -27,10 +27,7 @@ function getSystemTheme(): Theme {
 }
 
 function getSystemReduceMotion(): boolean {
-  if (typeof window === "undefined" || !window.matchMedia) {
-    return false;
-  }
-
+  if (typeof window === "undefined" || !window.matchMedia) return false;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
@@ -47,8 +44,10 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
     const initialTheme = storedTheme ?? getSystemTheme();
     setThemeState(initialTheme);
 
-    // Always enable motion by default and ignore system/user reduced-motion preferences
-    setReduceMotionState(false);
+    // Respect saved preference or system setting for reduced motion
+    const storedMotion = window.localStorage.getItem(MOTION_STORAGE_KEY);
+    const initialReduce = storedMotion ? storedMotion === "true" : getSystemReduceMotion();
+    setReduceMotionState(initialReduce);
   }, []);
 
   useEffect(() => {

@@ -13,6 +13,12 @@ const recentSubmissions = new Map<string, number>();
 const RATE_LIMIT_WINDOW_MS = 1000 * 60; // 1 minute
 
 export async function POST(request: Request) {
+  const origin = request.headers.get("origin") || "";
+  // Basic origin check to reduce cross-site abuse; adjust for staging if needed
+  const allowedOrigins = ["https://360ace.net", "https://www.360ace.net", "http://localhost:3000"];
+  if (origin && !allowedOrigins.includes(origin)) {
+    return NextResponse.json({ error: "Origin not allowed" }, { status: 403 });
+  }
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   const now = Date.now();
 

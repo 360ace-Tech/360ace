@@ -7,9 +7,9 @@ import { callToAction } from "@/lib/hub-content";
 
 export function CallToActionSection() {
   return (
-    <section className="py-20">
+    <section className="py-16 sm:py-20">
       <ScrollReveal direction="up" className="mx-auto w-full max-w-5xl px-4 sm:px-6">
-        <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-gradient-to-br from-[color:var(--color-tech-soft)] via-white to-[color:var(--color-food-soft)] p-10 text-center shadow-[var(--shadow-md)]">
+        <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-gradient-to-br from-[color:var(--color-tech-soft)] via-[color:var(--color-secondary)] to-[color:var(--color-food-soft)] p-8 sm:p-10 text-center shadow-[var(--shadow-md)]">
           <p className="text-sm uppercase tracking-[0.5em] text-[color:var(--color-muted-foreground)]">
             Let&apos;s collaborate
           </p>

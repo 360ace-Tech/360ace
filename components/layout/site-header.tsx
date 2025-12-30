@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -28,8 +29,24 @@ export function SiteHeader() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2">
           <TransitionLink href="/" className="flex items-center gap-2 font-semibold">
-            <img src="/logo-dark.png" alt="360ace logo" className="logo-light h-12 w-auto" />
-            <img src="/logo-light.png" alt="360ace logo" className="logo-dark h-12 w-auto" />
+            <span className="relative block h-12 w-[150px]">
+              <Image
+                src="/logo-dark.png"
+                alt="360ace logo"
+                className="logo-light object-contain"
+                fill
+                sizes="150px"
+                priority
+              />
+              <Image
+                src="/logo-light.png"
+                alt="360ace logo"
+                className="logo-dark object-contain"
+                fill
+                sizes="150px"
+                priority
+              />
+            </span>
             <div className="flex flex-col leading-[1.1]">
               <span className="text-[11px] uppercase tracking-[0.28em] text-[color:var(--color-muted-foreground)]">
                 360ace Tech Inc.

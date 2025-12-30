@@ -15,7 +15,7 @@ const accentClasses: Record<string, string> = {
 
 export function PracticesSection() {
   return (
-    <section id="practices" className="bg-[color:var(--color-muted)]/30 py-20 scroll-mt-24">
+    <section id="practices" className="bg-[color:var(--color-muted)]/30 py-16 sm:py-20 scroll-mt-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6">
         <ScrollReveal direction="up">
           <div className="max-w-2xl space-y-4">
@@ -33,7 +33,7 @@ export function PracticesSection() {
               key={practice.name}
               variants={staggerItemVariants}
               className={cn(
-                "flex h-full flex-col justify-between gap-6 rounded-[var(--radius-lg)] border p-8 shadow-sm shadow-black/5 transition-shadow duration-300 hover:shadow-md hover:shadow-black/10",
+                "flex h-full flex-col justify-between gap-6 rounded-[var(--radius-lg)] border p-6 sm:p-8 shadow-sm shadow-black/5 transition-shadow duration-300 hover:shadow-md hover:shadow-black/10",
                 accentClasses[practice.accent] ?? "bg-white border-[color:var(--color-border)]",
               )}
             >

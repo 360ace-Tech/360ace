@@ -6,7 +6,7 @@ import { testimonials } from "@/lib/hub-content";
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="bg-[color:var(--color-background)] py-20 scroll-mt-24">
+    <section id="testimonials" className="bg-[color:var(--color-background)] py-16 sm:py-20 scroll-mt-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6">
         <ScrollReveal direction="up">
           <div className="max-w-2xl space-y-4">
@@ -23,7 +23,7 @@ export function TestimonialsSection() {
             <motion.blockquote
               key={testimonial.quote}
               variants={staggerItemVariants}
-              className="group flex h-full flex-col justify-between rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-muted)]/30 p-8 transition-all duration-300 hover:shadow-md hover:shadow-black/10 hover:border-[color:var(--color-primary)]/30"
+              className="group flex h-full flex-col justify-between rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-muted)]/30 p-6 sm:p-8 transition-all duration-300 hover:shadow-md hover:shadow-black/10 hover:border-[color:var(--color-primary)]/30"
             >
               <p className="text-base text-[color:var(--color-foreground)] italic">&ldquo;{testimonial.quote}&rdquo;</p>
               <footer className="mt-4 pt-4 border-t border-[color:var(--color-border)]">

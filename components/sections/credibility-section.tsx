@@ -13,7 +13,7 @@ function parseStatValue(v: string): { n: number; suffix: string } {
 
 export function CredibilitySection() {
   return (
-    <section id="credibility" className="bg-[color:var(--color-muted)]/20 py-20 scroll-mt-24">
+    <section id="credibility" className="bg-[color:var(--color-muted)]/20 py-16 sm:py-20 scroll-mt-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6">
         <div className="max-w-2xl space-y-4">
           <p className="text-sm uppercase tracking-[0.5em] text-[color:var(--color-muted-foreground)]">
@@ -29,7 +29,7 @@ export function CredibilitySection() {
             return (
               <motion.div
                 key={stat.label}
-                className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-background)] p-8 text-center shadow-sm"
+                className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-background)] p-6 sm:p-8 text-center shadow-sm"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-10%" }}
