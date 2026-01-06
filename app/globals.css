@@ -21,6 +21,7 @@
   }
   /* Hide header during home preloading (but keep layout for accurate FLIP) */
   .preload-hide-header .site-nav { visibility: hidden; opacity: 0; pointer-events: none; }
+  .preload-hide-header .site-footer { visibility: hidden; opacity: 0; pointer-events: none; }
   ::selection { background: #D6D0C4; color: #1C1917; }
 }
 

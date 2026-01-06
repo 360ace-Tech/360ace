@@ -225,7 +225,7 @@ export function SiteFooter() {
   const techUrl = process.env.NEXT_PUBLIC_TECH_URL || "https://360ace.tech";
   const foodUrl = process.env.NEXT_PUBLIC_FOOD_URL || "https://360ace.food";
   return (
-    <footer className="w-full flex items-center justify-between border-t border-[#E5E2D8] py-4 px-6 md:px-12">
+    <footer className="site-footer w-full flex items-center justify-between border-t border-[#E5E2D8] py-4 px-6 md:px-12">
       <div className="text-[10px] text-[#8F877B] font-mono tracking-widest">
         © {new Date().getFullYear()} 360ace.NET — All Rights Reserved.
       </div>
