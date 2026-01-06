@@ -15,7 +15,7 @@ export const plexMono = IBM_Plex_Mono({
 });
 
 export const handwrite = localFont({
-  src: "../Amsterdam Handwriting.ttf",
+  src: "./fonts/AmsterdamHandwriting.ttf",
   display: "swap",
   variable: "--font-hand",
   weight: "400",
