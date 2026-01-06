@@ -38,6 +38,12 @@ export default function PageTransition({ children }: { children: React.ReactNode
   }, []);
 
   const coverPage = useCallback((url: string) => {
+    // Guard: do not transition to the same path
+    try {
+      const norm = (p: string) => (p.endsWith('/') && p !== '/' ? p.slice(0, -1) : p);
+      const target = new URL(url, window.location.href).pathname;
+      if (norm(target) === norm(pathname || '')) return;
+    } catch {}
     if (overlayRef.current) overlayRef.current.style.display = "grid";
     if (logoOverlayRef.current) logoOverlayRef.current.style.display = "grid";
     if (blocksRef.current.length) { gsap.set(blocksRef.current, { scaleX: 0, transformOrigin: "left" }); }
@@ -52,7 +58,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
       .add(() => setStartWrite(true))
       .to({}, { duration: totalWrite })
       .to(logoOverlayRef.current, { opacity: 0, duration: 0.25, ease: "power2.out" });
-  }, [router]);
+  }, [router, pathname]);
 
   useEffect(() => {
     const createBlocks = () => {
@@ -109,7 +115,11 @@ export default function PageTransition({ children }: { children: React.ReactNode
       if (!hrefAttr || hrefAttr.startsWith('#') || a.target === '_blank' || a.hasAttribute('download')) return;
       const abs = a.href || hrefAttr;
       let urlPath = '';
-      try { urlPath = new URL(abs, window.location.href).pathname; } catch { urlPath = hrefAttr; }
+      try {
+        const u = new URL(abs, window.location.href);
+        if (u.origin !== window.location.origin) return; // external: do not intercept
+        urlPath = u.pathname;
+      } catch { urlPath = hrefAttr; }
       if (!urlPath.startsWith('/')) return;
       const norm = (p: string) => (p.endsWith('/') && p !== '/' ? p.slice(0, -1) : p);
       if (norm(urlPath) !== norm(pathname || '')) {
@@ -128,7 +138,11 @@ export default function PageTransition({ children }: { children: React.ReactNode
       if (!a) return;
       const abs = a.href || a.getAttribute('href') || '';
       let urlPath = '';
-      try { urlPath = new URL(abs, window.location.href).pathname; } catch { urlPath = abs; }
+      try {
+        const u = new URL(abs, window.location.href);
+        if (u.origin !== window.location.origin) return; // external
+        urlPath = u.pathname;
+      } catch { urlPath = abs; }
       if (!urlPath.startsWith('/')) return;
       const norm = (p: string) => (p.endsWith('/') && p !== '/' ? p.slice(0, -1) : p);
       if (norm(urlPath) !== norm(pathname || '')) {
@@ -148,11 +162,29 @@ export default function PageTransition({ children }: { children: React.ReactNode
         const ce = ev as CustomEvent<string>;
         const url = ce.detail;
         if (!url || isTransitioning.current) return;
+        const norm = (p: string) => (p.endsWith('/') && p !== '/' ? p.slice(0, -1) : p);
+        let targetPath = '';
+        try { targetPath = new URL(url, window.location.href).pathname; } catch { targetPath = url; }
+        if (norm(targetPath) === norm(pathname || '')) return; // same page: do nothing
         isTransitioning.current = true;
         coverPage(url);
       } catch {}
     };
     window.addEventListener('trigger-transition', onTrigger as EventListener, { capture: true });
+
+    // Safety: if tab gains focus or page becomes visible, ensure overlays reset
+    const resetOverlays = () => {
+      isTransitioning.current = false;
+      if (overlayRef.current) overlayRef.current.style.display = 'none';
+      if (logoOverlayRef.current) logoOverlayRef.current.style.display = 'none';
+      setStartWrite(false);
+    };
+    const onPageShow = () => resetOverlays();
+    const onFocus = () => resetOverlays();
+    const onVisible = () => { if (document.visibilityState === 'visible') resetOverlays(); };
+    window.addEventListener('pageshow', onPageShow);
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
     return () => {
       document.removeEventListener('click', onDocClick as EventListener, { capture: true } as EventListenerOptions);
       document.removeEventListener('mousedown', onDocClick as EventListener, { capture: true } as EventListenerOptions);
@@ -160,6 +192,9 @@ export default function PageTransition({ children }: { children: React.ReactNode
       document.removeEventListener('touchstart', onDocClick as EventListener, { capture: true } as EventListenerOptions);
       document.removeEventListener('keydown', onKeyDown as EventListener, { capture: true } as EventListenerOptions);
       window.removeEventListener('trigger-transition', onTrigger as EventListener, { capture: true } as EventListenerOptions);
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [pathname, coverPage, revealPage]);
 

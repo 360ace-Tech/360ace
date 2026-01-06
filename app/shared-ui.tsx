@@ -7,6 +7,7 @@ import * as THREE from "three";
 import Link from "next/link";
 import Image from "next/image";
 import { Linkedin, Home, Cpu, Utensils, Workflow, Mail } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -70,9 +71,17 @@ export function GridLines({ visible = true }: { visible?: boolean }) {
 }
 
 export function Navbar({ logoRef, visible = true }: { logoRef?: React.RefObject<HTMLSpanElement | null>; visible?: boolean }) {
+  const pathname = usePathname();
+  const norm = (p: string) => (p.endsWith('/') && p !== '/' ? p.slice(0, -1) : p);
+  const isActive = (href: string) => norm(href) === norm(pathname || '');
   const onNavClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const href = (e.currentTarget.getAttribute('href') || '/');
+    if (isActive(href)) {
+      // same page — do nothing and don't trigger transition
+      e.preventDefault();
+      return;
+    }
     e.preventDefault();
     try { window.dispatchEvent(new CustomEvent('trigger-transition', { detail: href })); } catch {}
   };
@@ -89,10 +98,24 @@ export function Navbar({ logoRef, visible = true }: { logoRef?: React.RefObject<
           <span className="ml-8 text-[10px] text-[#8F877B] font-mono tracking-widest uppercase leading-none">CONSULTANCY</span>
         </div>
         <div className="hidden md:flex gap-8">
-          <Link href="/tech" onClick={onNavClick} className="interactive text-xs font-mono uppercase tracking-widest text-[#8F877B] hover:text-[#1C1917] transition-colors">Tech</Link>
-          <Link href="/food" onClick={onNavClick} className="interactive text-xs font-mono uppercase tracking-widest text-[#8F877B] hover:text-[#1C1917] transition-colors">Food</Link>
-          <Link href="/services" onClick={onNavClick} className="interactive text-xs font-mono uppercase tracking-widest text-[#8F877B] hover:text-[#1C1917] transition-colors">ENGAGEMENT</Link>
-          <Link href="/contact" onClick={onNavClick} className="interactive text-xs font-mono uppercase tracking-widest text-[#8F877B] hover:text-[#1C1917] transition-colors">Contact</Link>
+          {[
+            { href: "/tech", label: "Tech" },
+            { href: "/food", label: "Food" },
+            { href: "/services", label: "ENGAGEMENT" },
+            { href: "/contact", label: "Contact" },
+          ].map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link key={item.href} href={item.href} onClick={onNavClick}
+                aria-current={active ? 'page' : undefined}
+                className={`interactive relative text-xs font-mono uppercase tracking-widest transition-colors ${active ? 'text-[#1C1917]' : 'text-[#8F877B] hover:text-[#1C1917]'}`}>
+                <span className="relative">
+                  {item.label}
+                  <span className={`absolute -bottom-1 left-0 h-[2px] bg-[#1C1917] transition-transform origin-left ${active ? 'scale-x-100 w-full' : 'scale-x-0 w-full'}`} />
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>
@@ -225,10 +248,19 @@ export function MobileDock() {
   const onNavClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const href = (e.currentTarget.getAttribute('href') || '/');
+    // same-page guard handled by PageTransition, but also avoid dispatch here
+    const pathname = window.location ? window.location.pathname : '';
+    const norm = (p: string) => (p.endsWith('/') && p !== '/' ? p.slice(0, -1) : p);
+    if (norm(href) === norm(pathname)) return;
     e.preventDefault();
     try { window.dispatchEvent(new CustomEvent('trigger-transition', { detail: href })); } catch {}
   };
   const dockRef = useRef<HTMLDivElement|null>(null);
+  const pathname = usePathname();
+  const isActive = (href: string) => {
+    const norm = (p: string) => (p.endsWith('/') && p !== '/' ? p.slice(0, -1) : p);
+    return norm(href) === norm(pathname || '');
+  };
   useEffect(() => {
     if (!dockRef.current) return;
     const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
@@ -240,15 +272,20 @@ export function MobileDock() {
     gsap.fromTo(dockRef.current, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' });
     gsap.from(items, { y: 10, opacity: 0, duration: 0.4, ease: 'power2.out', stagger: 0.05, delay: 0.1 });
   }, []);
-  const Item = ({ href, label, children }: { href: string; label: string; children: React.ReactNode }) => (
-    <Link href={href} onClick={onNavClick} className="group relative dock-item inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white text-[#1C1917] shadow-sm border border-[#E5E2D8]">
-      {children}
-      <span className="pointer-events-none absolute -top-2 -translate-y-full opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono tracking-widest text-[#8F877B] bg-white border border-[#E5E2D8] rounded px-2 py-1">{label}</span>
-    </Link>
-  );
+  const Item = ({ href, label, children }: { href: string; label: string; children: React.ReactNode }) => {
+    const active = isActive(href);
+    return (
+      <Link href={href} onClick={onNavClick} aria-current={active ? 'page' : undefined}
+        className={`group relative dock-item inline-flex items-center justify-center w-12 h-12 rounded-xl shadow-sm border transition-colors ${active ? 'bg-[#1C1917] text-[#F9F7F2] border-[#1C1917]' : 'bg-white text-[#1C1917] border-[#E5E2D8]'}`}>
+        {children}
+        <span className="pointer-events-none absolute -top-2 -translate-y-full opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono tracking-widest text-[#8F877B] bg-white border border-[#E5E2D8] rounded px-2 py-1">{label}</span>
+        <span className={`pointer-events-none absolute bottom-1 h-[2px] rounded-full bg-current transition-all ${active ? 'w-6 opacity-100' : 'w-0 opacity-0'}`} />
+      </Link>
+    );
+  };
   return (
-    <nav ref={dockRef} className="mobile-dock fixed left-1/2 -translate-x-1/2 bottom-[calc(env(safe-area-inset-bottom,0px)+2rem)] z-[55] px-2 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-[#E5E2D8] shadow-lg">
-      <div className="flex items-center gap-2">
+    <nav ref={dockRef} className="mobile-dock fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+2.5rem)] z-[55] flex justify-center">
+      <div className="inline-flex items-center justify-center gap-2 px-2 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-[#E5E2D8] shadow-lg">
         <Item href="/" label="Home"><Home className="w-5 h-5" /></Item>
         <Item href="/tech" label="Tech"><Cpu className="w-5 h-5" /></Item>
         <Item href="/food" label="Food"><Utensils className="w-5 h-5" /></Item>
