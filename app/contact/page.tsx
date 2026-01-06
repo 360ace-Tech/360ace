@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { User, Mail, Building2, MessageSquareText, ChevronDown } from "lucide-react";
+import { User, Mail, Building2, MessageSquareText, ChevronDown, Check, AlertCircle } from "lucide-react";
 import gsap from "gsap";
 import Script from "next/script";
 
@@ -30,6 +30,8 @@ export default function ContactPage(){
   const formWrapRef = useRef<HTMLDivElement|null>(null);
   const [form, setForm] = useState<FormState>({ firstName: "", lastName: "", email: "", organization: "", category: "Tech", message: "", ts: String(Date.now()), website: "" });
   const [cfToken, setCfToken] = useState<string>("");
+  const [turnstileReady, setTurnstileReady] = useState(false);
+  const widgetIdRef = useRef<string | null>(null);
   const widgetRef = useRef<HTMLDivElement|null>(null);
   const heroRef = useRef<HTMLDivElement|null>(null);
   const collRef = useRef<HTMLDivElement|null>(null);
@@ -40,6 +42,24 @@ export default function ContactPage(){
     }
   }, [showForm]);
 
+  // Turnstile: render when ready and form is visible; capture tokens via event
+  useEffect(() => {
+    const onToken = (e: Event) => {
+      try { setCfToken((e as CustomEvent<string>).detail || ""); } catch {}
+    };
+    window.addEventListener('cf-token', onToken as EventListener);
+    return () => window.removeEventListener('cf-token', onToken as EventListener);
+  }, []);
+
+  useEffect(() => {
+    if (!showForm || !turnstileReady) return;
+    try {
+      // @ts-expect-error global helper from Script
+      const id = window.__renderCF?.();
+      if (id) widgetIdRef.current = id as string;
+    } catch {}
+  }, [showForm, turnstileReady]);
+
   useEffect(() => {
     if (!heroRef.current) return;
     gsap.to(heroRef.current, { y: showForm ? -48 : 0, duration: 0.6, ease: "power2.out" });
@@ -47,6 +67,13 @@ export default function ContactPage(){
       gsap.to(collRef.current, { maxHeight: showForm ? "70vh" : 0, duration: 0.6, ease: "power2.out" });
     }
   }, [showForm]);
+
+  // Auto-hide toast after 3 seconds
+  useEffect(() => {
+    if (!result) return;
+    const t = setTimeout(() => setResult(null), 3000);
+    return () => clearTimeout(t);
+  }, [result]);
 
   const onClickConnect = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -64,6 +91,8 @@ export default function ContactPage(){
     if (!form.lastName || form.lastName.trim().length < 2) errors.push("Last name must be at least 2 characters");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.push("Enter a valid email address");
     if (!form.message || form.message.trim().length < 20) errors.push("Message must be at least 20 characters");
+    const sitekeyPresent = !!(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+    if (sitekeyPresent && !cfToken) errors.push("Please verify you are human");
     if (errors.length) { setResult({ ok: false, message: errors[0] }); return; }
     setSubmitting(true);
     setResult(null);
@@ -152,7 +181,7 @@ export default function ContactPage(){
                 <div className="col-span-1 md:col-span-2">
                   <div ref={widgetRef} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}></div>
                 </div>
-                  <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-4 mt-2">
+                  <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-4 mt-2 relative">
                     <button type="submit" disabled={submitting}
                       aria-busy={submitting}
                       className={`interactive group relative inline-flex items-center justify-center px-8 py-3 rounded-full bg-[#1C1917] text-[#F9F7F2] font-medium overflow-hidden shadow-sm transition-[box-shadow,transform] ${submitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md hover:-translate-y-0.5'}`}>
@@ -162,7 +191,15 @@ export default function ContactPage(){
                       <span className="absolute inset-0 bg-[#F0ECE3] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out" />
                     </button>
                     {result && (
-                      <span className={`text-sm ${result.ok ? "text-green-700" : "text-red-700"}`}>{result.message}</span>
+                      <div role="status" aria-live="polite"
+                        className={`absolute right-0 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 px-3 py-2 rounded-full shadow-sm border text-sm ${result.ok ? 'bg-[#EAF6EA] border-[#B7E2B7] text-[#0F5132]' : 'bg-[#FDECEC] border-[#F5C2C7] text-[#842029]'}`}>
+                        {result.ok ? (
+                          <Check className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4" />
+                        )}
+                        <span>{result.message}</span>
+                      </div>
                     )}
                   </div>
                 </form>
@@ -173,18 +210,29 @@ export default function ContactPage(){
       </main>
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" onLoad={() => {
         try {
-          type Turnstile = { render: (el: HTMLElement, opts: { sitekey?: string; theme?: 'light'|'dark'; callback?: (token: string) => void }) => void };
+          type Turnstile = { render: (el: HTMLElement, opts: { sitekey?: string; theme?: 'light'|'dark'; callback?: (token: string) => void }) => string; reset: (id?: string) => void };
           type W = Window & { turnstile?: Turnstile };
           const w = window as W;
-          if (widgetRef.current && w && w.turnstile) {
-            w.turnstile.render(widgetRef.current, {
-              sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-              theme: 'light',
-              callback: (token: string) => setCfToken(token),
-            });
-          }
+          if (w.turnstile) setTurnstileReady(true);
         } catch {}
       }} />
+      <Script id="turnstile-render" strategy="afterInteractive">{`
+        window.__renderCF = function() {
+          try {
+            var el = document.querySelector('.cf-turnstile');
+            if (!el || !window.turnstile) return null;
+            el.innerHTML = '';
+            return window.turnstile.render(el, { sitekey: '${process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''}', theme: 'light', callback: function(token){ try{ window.dispatchEvent(new CustomEvent('cf-token',{detail:token})); }catch(e){} } });
+          } catch(e) { return null; }
+        }
+      `}</Script>
+      <Script id="turnstile-hooks" strategy="afterInteractive">{`
+        (function(){
+          function render(){ if (window.__renderCF) window.__renderCF(); }
+          window.addEventListener('page:revealed', render);
+          document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible') render(); });
+        })();
+      `}</Script>
     </div>
   );
 }
