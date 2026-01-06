@@ -1,0 +1,10 @@
+{
+  "title": "Trusted impact",
+  "taglineTop": "Delivering measurable change",
+  "taglineBottom": "for regulated and growth-focused teams.",
+  "stats": [
+    { "value": 5, "suffix": "+", "label": "Cloud systems guided by 360ace.Tech" },
+    { "value": 30, "suffix": "+", "label": "Food systems supported by 360ace.Food" },
+    { "value": 3, "suffix": "", "label": "Countries served with training and compliance programs" }
+  ]
+}

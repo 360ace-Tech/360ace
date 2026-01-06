@@ -28,6 +28,8 @@
     "360ace",
     "360ace-Tech",
     "360ace-Food",
-    "nextjs-app-router-page-transitions"
+    "nextjs-app-router-page-transitions",
+    "tmp_backup_*",
+    "tmp_backup_*/**"
   ]
 }

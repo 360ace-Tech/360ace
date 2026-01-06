@@ -1,59 +1,86 @@
-# 360ace Consultancy Hub
+# 360ace.NET — Consultancy Hub (Next.js 15)
 
-A Next.js 15 (App Router) experience that introduces the unified 360ace consultancy hub. The site highlights the two specialist practices — [360ace.Tech](https://360ace.tech) and [360ace.Food](https://360ace.food) — and directs visitors to the practice sites for deep engagement.
+Production‑ready Next.js (App Router) site for 360ace.NET with:
+- Home hero with responsive CTAs
+- Practice pages (Tech, Food)
+- Engagement model and Trusted Impact
+- Page transitions and preloader with TTL
+- Contact form (SMTP + Cloudflare Turnstile)
 
-## Tech Stack
-- Next.js 15 with the App Router and Turbopack dev server
-- TypeScript (strict), Tailwind CSS v4 tokens, custom design system primitives
-- shadcn-inspired UI components using `class-variance-authority`
-- Framer Motion (hero micro-interactions); motion toggle removed, animations enabled by default
-- React Hook Form + Zod validation for the contact workflow
+## Requirements
+- Node.js 18+
+- npm 10+
 
-## Local Development
+## Quick Start
 ```bash
 npm install
 npm run dev
+# http://localhost:3000
 ```
-Visit `http://localhost:3000` to view the site.
 
-## Quality Gates
-- `npm run lint` – ESLint (Next.js + TypeScript) with `--max-warnings=0`
-- `npm run typecheck` – TypeScript strict mode
-- `npm run build` – Production build with Turbopack
+Build and run production
+```bash
+npm run build
+npm start
+```
 
-## Project Structure
+## Environment
+Copy `.env.local.example` to `.env.local` and set:
+
+- SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
+- CONTACT_EMAIL_FROM, CONTACT_EMAIL_TO
+- TURNSTILE_SECRET_KEY, NEXT_PUBLIC_TURNSTILE_SITE_KEY
+- NEXT_PUBLIC_PRELOAD_TTL_MS (default 300000 = 5 minutes)
+- NEXT_PUBLIC_LINKEDIN_URL (optional for footer)
+
+Notes
+- Contact form posts to `/api/contact` and sends email via SMTP (Gmail App Password supported).
+- Cloudflare Turnstile is optional; if keys are provided, tokens are verified server‑side.
+- Preloader runs only when TTL has expired; visit state is stored in `localStorage` key `mk_preloaded_ts`.
+
+## Content Model
+Editable JSON under `content/`:
+- `hero.json` – headline lines, bottom copy, and CTAs (Visit TECH/FOOD URLs)
+- `engagement.json` – engagement stages (cards) and intro copy
+- `impact.json` – trusted impact title, taglines, stats, logos
+- `tech.json`, `food.json` – lists for practice pages
+
+## Structure
 ```
 app/
-  page.tsx                 # Home (hero, practices, process, testimonials)
-  consulting/page.tsx      # Overview with outbound CTAs to practice sites
-  contact/page.tsx         # Hub contact form
-  legal/*                  # Privacy & Terms templates
-  api/contact/route.ts     # Contact form handler with Zod validation + rate limit
+  layout.tsx, globals.css
+  page.tsx                 # Home
+  contact/page.tsx         # Contact (Connect with Us + form)
+  services/page.tsx        # Engagement model + Trusted Impact
+  tech/page.tsx            # Tech practice listings
+  food/page.tsx            # Food practice listings
+  api/contact/route.ts     # Contact form email + rate limit + Turnstile
 components/
-  layout/                  # Shell, header, footer
-  sections/                # Home page sections
-  forms/                   # Contact form
-  ui/                      # Button, inputs, toggles
+  page-transition.tsx, cookie-consent.tsx, site-logo.tsx
 content/
-  hub.json                 # Editable site content (hero, sections, CTAs)
-  site.json                # Title/description/base URL for metadata
-lib/
-  hub-content.ts           # Typed exports sourced from content/hub.json
-styles/
-  tokens.css               # Brand color + typography tokens
+  hero.json, engagement.json, impact.json, tech.json, food.json
+public/
+  logo-dark.png, favicon*, webmanifest
 ```
 
-## Editing Content
-- Update `content/hub.json` to change homepage copy, practice highlights, process, testimonials, and CTAs.
-- Update `content/site.json` to change the global site title, description, and base URL.
-- No code changes are required; components read from these JSON files.
+## Deployment
+Vercel (recommended)
+- Create a new project from this repo
+- Set `.env` from `.env.local.example`
+- Build Command: `npm run build` (Next.js 15)
+- Output: `/.vercel/output` (handled by Next)
 
-## Environment & Deployment
-- Configure email delivery for the contact route via environment variables when connecting Resend/SendGrid.
-- Add security headers (CSP, Permissions-Policy, Referrer-Policy) via your hosting platform (e.g., Vercel middleware).
-- Update `content/site.json` `baseUrl` if the production hostname changes.
+Self‑host
+- `npm run build && npm start`
+- Ensure env vars are present at runtime
 
-## Roadmap
-- Expand shadcn/ui component coverage and Storybook documentation
-- Add analytics & error monitoring (Vercel Analytics / Sentry)
-- Automate Lighthouse and Playwright smoke checks in CI
+## Scripts
+- `npm run dev` – Start dev server (Turbopack)
+- `npm run build` – Production build
+- `npm run start` – Start production server
+- `npm run lint` – ESLint with zero warnings
+- `npm run typecheck` – TypeScript no‑emit
+
+## Notes
+- Cursor effects are disabled on touch devices
+- Engagement text animations are disabled to avoid hidden states on client navigation; stats still count up when visible

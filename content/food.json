@@ -1,0 +1,11 @@
+{
+  "title": "Food Systems Services",
+  "items": [
+    { "title": "Training & Capability Building", "category": "Safety / Training" },
+    { "title": "Quality Systems Architecture", "category": "QA / Systems" },
+    { "title": "Regulatory & Audit Readiness", "category": "Audit/ Compliance" },
+    { "title": "Quality Assurance Partnerships", "category": "QA / Collaboration" },
+    { "title": "Research & Product Development", "category": "R&D" },
+    { "title": "Conference & Insight Support", "category": "Training / Analytics" }
+  ]
+}

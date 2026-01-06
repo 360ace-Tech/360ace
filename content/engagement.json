@@ -1,0 +1,14 @@
+{
+  "eyebrow": "A shared engagement model",
+  "headline": "Unified Services",
+  "highlight": "Platform",
+  "intro": "One playbook to unite platform velocity and product integrity.",
+  "services": [
+    { "title": "Assess", "desc": "Diagnostics across infrastructure, teams, and compliance baselines to surface priorities and risks." },
+    { "title": "Design", "desc": "Blueprints, roadmaps, and playbooks that align technology and quality programs with measurable outcomes." },
+    { "title": "Implement", "desc": "Cross-disciplinary squads embed automation, training, and governance with your teams." },
+    { "title": "Monitor", "desc": "Reliability runbooks, audits, and analytics keep platforms and production lines resilient." },
+    { "title": "Elevate", "desc": "Continuous improvement cycles unlock new markets, certifications, and product innovations." },
+    { "title": "Scale", "desc": "Enterprise rollout, partner enablement, and long-term operating models to sustain outcomes." }
+  ]
+}

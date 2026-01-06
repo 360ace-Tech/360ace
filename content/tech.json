@@ -1,0 +1,9 @@
+{
+  "title": "Technology Services",
+  "items": [
+    { "title": "Cloud Adoption strategy ", "category": "Cloud / Strategy" },
+    { "title": "Cloud Architecture", "category": "Cloud / Architecture" },
+    { "title": "Platform Engineering", "category": "Automation / DevOps / SRE" },
+    { "title": "AI & data platform enablement", "category": "AI / ML / Data" }
+  ]
+}
