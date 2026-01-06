@@ -30,7 +30,7 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown";
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
     if (!rateLimit(ip)) {
       return NextResponse.json({ message: "Too many requests, please try later." }, { status: 429 });
     }
