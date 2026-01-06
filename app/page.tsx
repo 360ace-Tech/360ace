@@ -65,7 +65,7 @@ function Scene({ isLoading, onReady }: { isLoading: boolean; onReady?: () => voi
   const mountRef = useRef<HTMLDivElement | null>(null);
   const meshMatRef = useRef<THREE.MeshBasicMaterial | null>(null);
   const pointsMatRef = useRef<THREE.PointsMaterial | null>(null);
-  const readyCbRef = useRef<typeof onReady>();
+  const readyCbRef = useRef<typeof onReady>(undefined);
 
   useEffect(() => { readyCbRef.current = onReady; }, [onReady]);
 

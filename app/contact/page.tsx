@@ -132,7 +132,9 @@ export default function ContactPage(){
       </main>
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" onLoad={() => {
         try {
-          const w = (window as any);
+          type Turnstile = { render: (el: HTMLElement, opts: { sitekey?: string; theme?: 'light'|'dark'; callback?: (token: string) => void }) => void };
+          type W = Window & { turnstile?: Turnstile };
+          const w = window as W;
           if (widgetRef.current && w && w.turnstile) {
             w.turnstile.render(widgetRef.current, {
               sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,

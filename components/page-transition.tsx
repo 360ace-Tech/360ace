@@ -60,7 +60,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
     }
 
     // Global capture-phase click interception for all internal links (reliable for Next <Link>)
-    const onDocClick = (ev: Event) => {
+    const onDocClick: EventListener = (ev) => {
       const e = ev as MouseEvent;
       const isModified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
       if (isModified) return;
@@ -82,7 +82,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
         }
       }
     };
-    const onKeyDown = (ev: Event) => {
+    const onKeyDown: EventListener = (ev) => {
       const e = ev as KeyboardEvent;
       if (e.key !== 'Enter') return;
       const t = e.target as Element | null;
@@ -99,10 +99,10 @@ export default function PageTransition({ children }: { children: React.ReactNode
       }
     };
     document.addEventListener('click', onDocClick, { capture: true });
-    document.addEventListener('mousedown', onDocClick as any, { capture: true });
-    document.addEventListener('pointerdown', onDocClick as any, { capture: true });
-    document.addEventListener('touchstart', onDocClick as any, { capture: true });
-    document.addEventListener('keydown', onKeyDown as any, { capture: true });
+    document.addEventListener('mousedown', onDocClick, { capture: true });
+    document.addEventListener('pointerdown', onDocClick, { capture: true });
+    document.addEventListener('touchstart', onDocClick, { capture: true });
+    document.addEventListener('keydown', onKeyDown, { capture: true });
 
     // Programmatic trigger from Navbar (fallback if link interception is blocked)
     const onTrigger = (ev: Event) => {
@@ -114,14 +114,14 @@ export default function PageTransition({ children }: { children: React.ReactNode
         coverPage(url);
       } catch {}
     };
-    window.addEventListener('trigger-transition', onTrigger as any, { capture: true } as any);
+    window.addEventListener('trigger-transition', onTrigger as EventListener, { capture: true });
     return () => {
-      document.removeEventListener('click', onDocClick, { capture: true } as any);
-      document.removeEventListener('mousedown', onDocClick as any, { capture: true } as any);
-      document.removeEventListener('pointerdown', onDocClick as any, { capture: true } as any);
-      document.removeEventListener('touchstart', onDocClick as any, { capture: true } as any);
-      document.removeEventListener('keydown', onKeyDown as any, { capture: true } as any);
-      window.removeEventListener('trigger-transition', onTrigger as any, { capture: true } as any);
+      document.removeEventListener('click', onDocClick as EventListener, { capture: true } as EventListenerOptions);
+      document.removeEventListener('mousedown', onDocClick as EventListener, { capture: true } as EventListenerOptions);
+      document.removeEventListener('pointerdown', onDocClick as EventListener, { capture: true } as EventListenerOptions);
+      document.removeEventListener('touchstart', onDocClick as EventListener, { capture: true } as EventListenerOptions);
+      document.removeEventListener('keydown', onKeyDown as EventListener, { capture: true } as EventListenerOptions);
+      window.removeEventListener('trigger-transition', onTrigger as EventListener, { capture: true } as EventListenerOptions);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

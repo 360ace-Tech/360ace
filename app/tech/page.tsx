@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "lucide-react";
@@ -28,9 +28,12 @@ function ProjectItem({ title, category, index }: { title: string; category: stri
   );
 }
 
+type TechItem = { title: string; category: string };
+type TechData = { title?: string; items: TechItem[] };
+
 export default function TechPage() {
   const ref = useRef<HTMLDivElement | null>(null);
-  const items = (data as any).items as { title: string; category: string }[];
+  const items = (data as TechData).items;
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const rows = gsap.utils.toArray<HTMLElement>(".project-row");
@@ -48,7 +51,7 @@ export default function TechPage() {
           <div className="mb-16 flex flex-col md:flex-row items-start md:items-end justify-between border-b border-[#E5E2D8] pb-6 gap-3">
             <div className="max-w-full">
               <span className="text-[10px] font-mono text-[#8F877B] uppercase tracking-widest block mb-2">TECH</span>
-              <h1 className="text-5xl text-[#1C1917] font-light tracking-tight">{(data as any).title ?? "Tech Projects"}</h1>
+              <h1 className="text-5xl text-[#1C1917] font-light tracking-tight">{(data as TechData).title ?? "Tech Projects"}</h1>
             </div>
             <a href="https://360ace.tech" target="_blank" rel="noopener noreferrer" className="interactive group flex items-center gap-3 text-[#8F877B] hover:text-[#1C1917] transition-colors text-[10px] font-mono uppercase tracking-widest">
               <div className="w-2 h-2 bg-[#1C1917] rounded-full" />

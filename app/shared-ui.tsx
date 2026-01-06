@@ -71,7 +71,7 @@ export function GridLines({ visible = true }: { visible?: boolean }) {
 
 export function Navbar({ logoRef, visible = true }: { logoRef?: React.RefObject<HTMLSpanElement | null>; visible?: boolean }) {
   const onNavClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e as any).button !== 0) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const href = (e.currentTarget.getAttribute('href') || '/');
     e.preventDefault();
     try { window.dispatchEvent(new CustomEvent('trigger-transition', { detail: href })); } catch {}
@@ -193,7 +193,7 @@ export function SiteFooter() {
 
 export function MobileDock() {
   const onNavClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e as any).button !== 0) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const href = (e.currentTarget.getAttribute('href') || '/');
     e.preventDefault();
     try { window.dispatchEvent(new CustomEvent('trigger-transition', { detail: href })); } catch {}

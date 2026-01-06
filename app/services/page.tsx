@@ -3,7 +3,7 @@
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Monitor, Smartphone, Box, PenTool, Search, Wrench, Activity, TrendingUp } from "lucide-react";
+import { PenTool, Search, Wrench, Activity, TrendingUp } from "lucide-react";
 import engagement from "@/content/engagement.json";
 import impact from "@/content/impact.json";
 
@@ -20,17 +20,21 @@ function ServiceCard({icon,title,desc}:{icon:React.ReactNode,title:string,desc:s
 
 // Block reveal only (no character splitting)
 
-const icons = [
-  <Search className="w-5 h-5"/>,
-  <PenTool className="w-5 h-5"/>,
-  <Wrench className="w-5 h-5"/>,
-  <Activity className="w-5 h-5"/>,
-  <TrendingUp className="w-5 h-5"/>
-];
+const getIcon = (i: number) => {
+  const Icon = [Search, PenTool, Wrench, Activity, TrendingUp][i % 5];
+  return <Icon className="w-5 h-5" />;
+};
+
+type EngagementService = { title: string; desc: string };
+type EngagementData = { eyebrow?: string; headline?: string; highlight?: string; intro?: string; services: EngagementService[] };
+type ImpactStat = { value: number; suffix?: string; label: string };
+type ImpactData = { title?: string; taglineTop?: string; taglineBottom?: string; stats: ImpactStat[]; logos?: string[] };
 
 export default function ServicesPage(){
-  const services = (engagement as any).services as {title:string;desc:string}[];
-  const stats = (impact as any).stats as {value:number;suffix?:string;label:string}[];
+  const e = engagement as EngagementData;
+  const im = impact as ImpactData;
+  const services = e.services;
+  const stats = im.stats;
   // Text reveals disabled per request
   useEffect(() => {
     // Only keep count-up like index.html behavior; remove card reveals to avoid hidden state.
@@ -63,17 +67,17 @@ export default function ServicesPage(){
         <section className="pt-28 md:pt-32 pb-16 px-6 md:px-12 relative z-10 scroll-mt-32">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="lg:col-span-4">
-              <span className="eng-reveal text-[10px] font-mono text-[#8F877B] uppercase tracking-widest block mb-3">{(engagement as any).eyebrow ?? "Our Expertise"}</span>
+              <span className="eng-reveal text-[10px] font-mono text-[#8F877B] uppercase tracking-widest block mb-3">{e.eyebrow ?? "Our Expertise"}</span>
               <h1 className="eng-reveal text-5xl text-[#1C1917] font-semibold tracking-tighter leading-tight mb-6">
-                {(engagement as any).headline ?? "Engineering"}
+                {e.headline ?? "Engineering"}
                 <br/>
-                <span className="text-[#D6D0C4]">{(engagement as any).highlight ?? "Platforma"}</span>
+                <span className="text-[#D6D0C4]">{e.highlight ?? "Platforma"}</span>
               </h1>
-              <p className="eng-reveal text-[#7E786E] font-light leading-relaxed mb-8">{(engagement as any).intro ?? "We don't just build websites; we construct digital ecosystems."}</p>
+              <p className="eng-reveal text-[#7E786E] font-light leading-relaxed mb-8">{e.intro ?? "We don't just build websites; we construct digital ecosystems."}</p>
             </div>
             <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-px bg-[#E5E2D8] border border-[#E5E2D8]">
               {services.map((s, i)=> (
-                <div key={i}><ServiceCard icon={icons[i % icons.length]} title={`${i+1}. ${s.title}`} desc={s.desc} /></div>
+                <div key={`${s.title}-${i}`}><ServiceCard icon={getIcon(i)} title={`${i+1}. ${s.title}`} desc={s.desc} /></div>
               ))}
             </div>
           </div>
@@ -81,11 +85,11 @@ export default function ServicesPage(){
 
         <section className="py-16 px-6 md:px-12 relative z-10 impact-gradient rounded-xl">
           <div className="mb-6 space-y-1">
-            <span className="eng-reveal text-[10px] font-mono text-[#8F877B] uppercase tracking-widest block">{(impact as any).title ?? "Trusted impact"}</span>
+            <span className="eng-reveal text-[10px] font-mono text-[#8F877B] uppercase tracking-widest block">{im.title ?? "Trusted impact"}</span>
             <h2 className="eng-reveal text-4xl md:text-5xl text-[#1C1917] font-semibold tracking-tighter leading-tight">
-              {(impact as any).taglineTop ?? "Delivering measurable change"}
+              {im.taglineTop ?? "Delivering measurable change"}
               <br/>
-              <span className="text-[#D6D0C4]">{(impact as any).taglineBottom ?? "for regulated and growth-focused teams."}</span>
+              <span className="text-[#D6D0C4]">{im.taglineBottom ?? "for regulated and growth-focused teams."}</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#E5E2D8] border border-[#E5E2D8] mb-12">
@@ -98,10 +102,10 @@ export default function ServicesPage(){
               </div>
             ))}
           </div>
-          {Array.isArray((impact as any).logos) && (
+          {Array.isArray(im.logos) && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#E5E2D8] border border-[#E5E2D8]">
-              {(impact as any).logos.map((name:string, i:number)=> (
-                <div key={i} className="bg-white p-4 text-center text-xs font-mono uppercase tracking-widest text-[#8F877B]">{name}</div>
+              {im.logos.map((name, i)=> (
+                <div key={`${name}-${i}`} className="bg-white p-4 text-center text-xs font-mono uppercase tracking-widest text-[#8F877B]">{name}</div>
               ))}
             </div>
           )}

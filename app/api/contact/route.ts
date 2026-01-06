@@ -65,8 +65,9 @@ export async function POST(req: NextRequest) {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: form.toString(),
         });
-        const json: any = await resp.json();
-        if (!json.success) {
+        const json: unknown = await resp.json();
+        const ok = typeof (json as { success?: boolean }).success === 'boolean' ? (json as { success?: boolean }).success : false;
+        if (!ok) {
           return NextResponse.json({ message: "Captcha failed" }, { status: 400 });
         }
       } catch {
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Send email via nodemailer
-    let nodemailer: any;
+    let nodemailer: unknown;
     try {
       nodemailer = (await import("nodemailer")).default;
     } catch {
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Email is not configured on server." }, { status: 500 });
     }
 
-    const transporter = nodemailer.createTransport({
+    const transporter = (nodemailer as { createTransport: (opts: { host: string; port: number; secure: boolean; auth: { user: string; pass: string } }) => { sendMail: (o: { from: string; to: string; subject: string; text: string; replyTo?: string }) => Promise<unknown> } }).createTransport({
       host: SMTP_HOST,
       port: Number(SMTP_PORT),
       secure: Number(SMTP_PORT) === 465,
