@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "Message sent. We will be in touch." });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ message: "Unexpected error" }, { status: 500 });
   }
 }

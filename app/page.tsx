@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Script from "next/script";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -86,7 +87,7 @@ function Scene({ isLoading, onReady }: { isLoading: boolean; onReady?: () => voi
     const group = new THREE.Group();
 
     const geo1 = new THREE.TorusKnotGeometry(1.2, 0.4, 120, 20);
-    const mat1 = new THREE.MeshBasicMaterial({ color: 0xDED9CC, wireframe: true, transparent: true, opacity: isLoading ? 0.35 : 0.18 });
+    const mat1 = new THREE.MeshBasicMaterial({ color: 0xDED9CC, wireframe: true, transparent: true, opacity: 0.35 });
     const mesh1 = new THREE.Mesh(geo1, mat1);
     meshMatRef.current = mat1;
     group.add(mesh1);
@@ -95,7 +96,7 @@ function Scene({ isLoading, onReady }: { isLoading: boolean; onReady?: () => voi
     const pos = geo2.attributes.position.array as ArrayLike<number>;
     const pointsGeo = new THREE.BufferGeometry();
     pointsGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pos as unknown as number[]), 3));
-    const pointsMat = new THREE.PointsMaterial({ size: isLoading ? 0.04 : 0.032, color: isLoading ? 0x8F877B : 0x9C9487 });
+    const pointsMat = new THREE.PointsMaterial({ size: 0.04, color: 0x8F877B });
     const points = new THREE.Points(pointsGeo, pointsMat);
     pointsMatRef.current = pointsMat;
     group.add(points);
@@ -245,7 +246,9 @@ function Preloader({ sceneReady, onDone }: { sceneReady: boolean; onDone: () => 
   return (
     <div ref={overlayRef} className="fixed inset-0 z-40 flex items-center justify-center bg-transparent pointer-events-auto">
       <span data-el="preloader-logo" ref={logoRef} className="inline-flex items-center gap-0 align-middle">
-        <img src="/logo-dark.png" alt="360ace logo" className="h-8 w-auto select-none" />
+        {(
+          <Image src="/logo-dark.png" alt="360ace logo" width={120} height={32} className="h-8 w-auto select-none" />
+        )}
         <span className="header-logo-text text-[#1C1917] text-xl leading-none whitespace-nowrap font-bold tracking-tighter">360ace.NET</span>
       </span>
       <div className="absolute bottom-0 left-0 w-full h-2 bg-[#E5E2D8]">
@@ -286,7 +289,7 @@ function Hero({ ready }: { ready: boolean }) {
     if (!ready) return;
     const cleanup = runHero();
     return () => cleanup();
-  }, [ready, rerunRef.current]);
+  }, [ready]);
 
   useEffect(() => {
     const onReveal = () => { rerunRef.current++; runHero(); };
@@ -512,7 +515,7 @@ export default function Page() {
       <GridLines visible={!isLoading} />
       <Scene isLoading={isLoading} onReady={() => setSceneReady(true)} />
       {isLoading && (
-        <Preloader sceneReady={sceneReady} onDone={() => { try{ localStorage.setItem('mk_preloaded_ts', String(Date.now())); }catch(_err){}; setIsLoading(false); }} />
+        <Preloader sceneReady={sceneReady} onDone={() => { try{ localStorage.setItem('mk_preloaded_ts', String(Date.now())); }catch{}; setIsLoading(false); }} />
       )}
       <main ref={contentRef} className={`relative z-10 transition-opacity duration-500 ${isLoading ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
         <Hero ready={!isLoading} />

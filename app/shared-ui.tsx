@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
 import Link from "next/link";
+import Image from "next/image";
 import { Linkedin, Home, Cpu, Utensils, Workflow, Mail } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -81,7 +82,7 @@ export function Navbar({ logoRef, visible = true }: { logoRef?: React.RefObject<
         <div className="flex flex-col">
           <Link href="/" onClick={onNavClick} className="interactive">
             <span data-el="header-logo" ref={logoRef as React.RefObject<HTMLSpanElement>} className="header-logo inline-flex items-center gap-0 align-middle">
-              <img src="/logo-dark.png" alt="360ace logo" className="h-8 w-auto select-none" />
+              <Image src="/logo-dark.png" alt="360ace logo" width={120} height={32} className="h-8 w-auto select-none" />
               <span className="header-logo-text text-[#1C1917] text-xl leading-none whitespace-nowrap font-bold tracking-tighter">360ace.NET</span>
             </span>
           </Link>

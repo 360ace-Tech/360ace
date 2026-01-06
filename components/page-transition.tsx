@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import gsap from "gsap";
 import Logo from "./site-logo";
@@ -15,6 +15,44 @@ export default function PageTransition({ children }: { children: React.ReactNode
 
   const router = useRouter();
   const pathname = usePathname();
+
+  const revealPage = useCallback(() => {
+    if (overlayRef.current) overlayRef.current.style.display = 'grid';
+    gsap.set(blocksRef.current, { scaleX: 1, transformOrigin: "right" });
+    gsap.to(blocksRef.current, {
+      scaleX: 0,
+      duration: 0.4,
+      stagger: 0.02,
+      ease: "power2.out",
+      transformOrigin: "right",
+      onComplete: () => {
+        isTransitioning.current = false;
+        if (overlayRef.current) overlayRef.current.style.display = 'none';
+        if (logoOverlayRef.current) logoOverlayRef.current.style.display = 'none';
+        try {
+          window.dispatchEvent(new CustomEvent('page:revealed'));
+          requestAnimationFrame(() => { window.dispatchEvent(new Event('resize')); window.dispatchEvent(new Event('scroll')); });
+        } catch {}
+      },
+    });
+  }, []);
+
+  const coverPage = useCallback((url: string) => {
+    if (overlayRef.current) overlayRef.current.style.display = "grid";
+    if (logoOverlayRef.current) logoOverlayRef.current.style.display = "grid";
+    if (blocksRef.current.length) { gsap.set(blocksRef.current, { scaleX: 0, transformOrigin: "left" }); }
+    gsap.set(logoOverlayRef.current, { opacity: 0 });
+    const TRANSITION_TEXT = "360ace Technologies";
+    const CHAR_DELAY = 0.08; const WRITE_DUR = 0.2; const FILL_DUR = 0.12;
+    const count = TRANSITION_TEXT.length; const totalWrite = (count - 1) * CHAR_DELAY + WRITE_DUR + FILL_DUR;
+    setStartWrite(false);
+    const tl = gsap.timeline({ onComplete: () => router.push(url) });
+    tl.to(blocksRef.current, { scaleX: 1, duration: 0.4, stagger: 0.02, ease: "power2.out", transformOrigin: "left" })
+      .set(logoOverlayRef.current, { opacity: 1 })
+      .add(() => setStartWrite(true))
+      .to({}, { duration: totalWrite })
+      .to(logoOverlayRef.current, { opacity: 0, duration: 0.25, ease: "power2.out" });
+  }, [router]);
 
   useEffect(() => {
     const createBlocks = () => {
@@ -123,72 +161,14 @@ export default function PageTransition({ children }: { children: React.ReactNode
       document.removeEventListener('keydown', onKeyDown as EventListener, { capture: true } as EventListenerOptions);
       window.removeEventListener('trigger-transition', onTrigger as EventListener, { capture: true } as EventListenerOptions);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pathname, coverPage, revealPage]);
 
   // When route changes (after push), reveal
   useEffect(() => {
     if (isTransitioning.current) {
       revealPage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
-
-  const coverPage = (url: string) => {
-    // Ensure overlays are visible and blocks are reset before animating
-    if (overlayRef.current) overlayRef.current.style.display = "grid";
-    if (logoOverlayRef.current) logoOverlayRef.current.style.display = "grid";
-    if (blocksRef.current.length) {
-      gsap.set(blocksRef.current, { scaleX: 0, transformOrigin: "left" });
-    }
-    gsap.set(logoOverlayRef.current, { opacity: 0 });
-    const TRANSITION_TEXT = "360ace Technologies";
-    const CHAR_DELAY = 0.08; // faster between letters
-    const WRITE_DUR = 0.2;   // faster letter draw
-    const FILL_DUR = 0.12;   // faster fill
-    const count = TRANSITION_TEXT.length;
-    const totalWrite = (count - 1) * CHAR_DELAY + WRITE_DUR + FILL_DUR;
-
-    setStartWrite(false);
-    const tl = gsap.timeline({ onComplete: () => router.push(url) });
-
-    tl.to(blocksRef.current, {
-      scaleX: 1,
-      duration: 0.4,
-      stagger: 0.02,
-      ease: "power2.out",
-      transformOrigin: "left",
-    })
-      .set(logoOverlayRef.current, { opacity: 1 })
-      .add(() => setStartWrite(true))
-      .to({}, { duration: totalWrite })
-      .to(logoOverlayRef.current, { opacity: 0, duration: 0.25, ease: "power2.out" });
-  };
-
-  const revealPage = () => {
-    if (overlayRef.current) overlayRef.current.style.display = 'grid';
-    gsap.set(blocksRef.current, { scaleX: 1, transformOrigin: "right" });
-    gsap.to(blocksRef.current, {
-      scaleX: 0,
-      duration: 0.4,
-      stagger: 0.02,
-      ease: "power2.out",
-      transformOrigin: "right",
-      onComplete: () => {
-        isTransitioning.current = false;
-        if (overlayRef.current) overlayRef.current.style.display = 'none';
-        if (logoOverlayRef.current) logoOverlayRef.current.style.display = 'none';
-        try {
-          window.dispatchEvent(new CustomEvent('page:revealed'));
-          // nudge layout engines/observers that depend on viewport
-          requestAnimationFrame(() => {
-            window.dispatchEvent(new Event('resize'));
-            window.dispatchEvent(new Event('scroll'));
-          });
-        } catch {}
-      },
-    });
-  };
+  }, [pathname, revealPage]);
 
   // no special queries needed for CSS-driven handwriting
 

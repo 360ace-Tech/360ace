@@ -72,7 +72,7 @@ export default function ContactPage(){
       const json = await res.json();
       setResult({ ok: res.ok, message: json.message || (res.ok ? "Sent" : "Failed") });
       if (res.ok) setForm({ firstName: "", lastName: "", email: "", organization: "", category: "Tech", message: "", ts: String(Date.now()), website: "" });
-    } catch (err) {
+    } catch {
       setResult({ ok: false, message: "Network error" });
     } finally {
       setSubmitting(false);
