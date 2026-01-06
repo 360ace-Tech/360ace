@@ -5,8 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
 import Link from "next/link";
-import { Linkedin } from "lucide-react";
-import { Home, Cpu, Utensils, Workflow, Mail } from "lucide-react";
+import { Linkedin, Home, Cpu, Utensils, Workflow, Mail } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -199,14 +198,24 @@ export function Scene({ isLoading = false, onReady }: { isLoading?: boolean; onR
 
 export function SiteFooter() {
   const href = process.env.NEXT_PUBLIC_LINKEDIN_URL || "https://www.linkedin.com/company/360ace/";
+  const techUrl = process.env.NEXT_PUBLIC_TECH_URL || "https://360ace.tech";
+  const foodUrl = process.env.NEXT_PUBLIC_FOOD_URL || "https://360ace.food";
   return (
     <footer className="w-full flex items-center justify-between border-t border-[#E5E2D8] py-4 px-6 md:px-12">
       <div className="text-[10px] text-[#8F877B] font-mono tracking-widest">
         © {new Date().getFullYear()} 360ace.NET — All Rights Reserved.
       </div>
-      <a href={href} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="interactive text-[#8F877B] hover:text-[#1C1917] transition-colors">
-        <Linkedin className="w-5 h-5" />
-      </a>
+      <div className="flex items-center gap-4">
+        <a href={techUrl} target="_blank" rel="noopener noreferrer" aria-label="360ace Tech" className="interactive text-[#8F877B] hover:text-[#1C1917] transition-colors">
+          <Cpu className="w-5 h-5" />
+        </a>
+        <a href={foodUrl} target="_blank" rel="noopener noreferrer" aria-label="360ace Food" className="interactive text-[#8F877B] hover:text-[#1C1917] transition-colors">
+          <Utensils className="w-5 h-5" />
+        </a>
+        <a href={href} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="interactive text-[#8F877B] hover:text-[#1C1917] transition-colors">
+          <Linkedin className="w-5 h-5" />
+        </a>
+      </div>
     </footer>
   );
 }
@@ -221,6 +230,11 @@ export function MobileDock() {
   const dockRef = useRef<HTMLDivElement|null>(null);
   useEffect(() => {
     if (!dockRef.current) return;
+    const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+    if (isDesktop) {
+      // On desktop, CSS handles visibility tied to header-hidden with smooth transitions.
+      return;
+    }
     const items = dockRef.current.querySelectorAll('.dock-item');
     gsap.fromTo(dockRef.current, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' });
     gsap.from(items, { y: 10, opacity: 0, duration: 0.4, ease: 'power2.out', stagger: 0.05, delay: 0.1 });
@@ -232,7 +246,7 @@ export function MobileDock() {
     </Link>
   );
   return (
-    <nav ref={dockRef} className="md:hidden fixed left-1/2 -translate-x-1/2 bottom-[calc(env(safe-area-inset-bottom,0px)+2rem)] z-[55] px-2 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-[#E5E2D8] shadow-lg">
+    <nav ref={dockRef} className="mobile-dock fixed left-1/2 -translate-x-1/2 bottom-[calc(env(safe-area-inset-bottom,0px)+2rem)] z-[55] px-2 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-[#E5E2D8] shadow-lg">
       <div className="flex items-center gap-2">
         <Item href="/" label="Home"><Home className="w-5 h-5" /></Item>
         <Item href="/tech" label="Tech"><Cpu className="w-5 h-5" /></Item>

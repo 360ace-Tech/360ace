@@ -20,10 +20,12 @@ function rateLimit(ip: string): boolean {
 }
 
 const schema = z.object({
-  name: z.string().min(2).max(120),
+  firstName: z.string().min(2).max(60),
+  lastName: z.string().min(2).max(60),
+  organization: z.string().max(120).optional(),
   email: z.string().email(),
   category: z.enum(["Tech", "Food"]),
-  message: z.string().min(10).max(5000),
+  message: z.string().min(20).max(5000),
   ts: z.string(),
   website: z.string().optional(), // honeypot
 });
@@ -96,8 +98,10 @@ export async function POST(req: NextRequest) {
       auth: { user: SMTP_USER, pass: SMTP_PASS },
     });
 
-    const subject = `New ${data.category} inquiry from ${data.name}`;
-    const text = `Name: ${data.name}\nEmail: ${data.email}\nCategory: ${data.category}\nIP: ${ip}\n---\n${data.message}`;
+    const fullName = `${data.firstName} ${data.lastName}`.trim();
+    const org = (data.organization || '').trim();
+    const subject = `New ${data.category} inquiry from ${fullName}${org ? ` (${org})` : ''}`;
+    const text = `Name: ${fullName}\nEmail: ${data.email}\nCategory: ${data.category}${org ? `\nOrganization: ${org}` : ''}\nIP: ${ip}\n---\n${data.message}`;
 
     await transporter.sendMail({
       from: CONTACT_EMAIL_FROM,

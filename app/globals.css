@@ -35,8 +35,8 @@
 .header-hidden .site-nav { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 .mobile-dock { transition: transform .35s ease, opacity .3s ease; }
 @media (min-width: 1024px) {
-  .mobile-dock { display: none; transform: translateY(16px); opacity: 0; }
-  .header-hidden .mobile-dock { display: block !important; transform: translateY(0); opacity: 1; }
+  .mobile-dock { pointer-events: none; transform: translateY(16px); opacity: 0; }
+  .header-hidden .mobile-dock { pointer-events: auto; transform: translateY(0); opacity: 1; }
 }
 
 /* Handwriting brand font helper */

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { User, Mail, Building2, MessageSquareText, ChevronDown } from "lucide-react";
 import gsap from "gsap";
 import Script from "next/script";
 
@@ -12,8 +13,10 @@ function CustomCursor(){
 function GridLines(){return(<div className="fixed inset-0 w-full h-full pointer-events-none z-0 border-x border-[#E5E2D880] flex justify-between"><div className="h-full w-px bg-[#E5E2D84D] hidden md:block"/><div className="h-full w-px bg-[#E5E2D84D]"/><div className="h-full w-px bg-[#E5E2D84D] hidden md:block"/></div>)}
 
 type FormState = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  organization?: string;
   category: "Tech" | "Food";
   message: string;
   ts: string;
@@ -25,7 +28,7 @@ export default function ContactPage(){
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<null | { ok: boolean; message: string }>(null);
   const formWrapRef = useRef<HTMLDivElement|null>(null);
-  const [form, setForm] = useState<FormState>({ name: "", email: "", category: "Tech", message: "", ts: String(Date.now()), website: "" });
+  const [form, setForm] = useState<FormState>({ firstName: "", lastName: "", email: "", organization: "", category: "Tech", message: "", ts: String(Date.now()), website: "" });
   const [cfToken, setCfToken] = useState<string>("");
   const widgetRef = useRef<HTMLDivElement|null>(null);
   const heroRef = useRef<HTMLDivElement|null>(null);
@@ -50,18 +53,25 @@ export default function ContactPage(){
     setShowForm((s) => !s);
     setResult(null);
     setForm((f) => ({ ...f, ts: String(Date.now()) }));
-    setTimeout(() => { (document.getElementById("name") as HTMLInputElement | null)?.focus(); }, 200);
+    setTimeout(() => { (document.getElementById("firstName") as HTMLInputElement | null)?.focus(); }, 200);
   };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Basic client validations
+    const errors: string[] = [];
+    if (!form.firstName || form.firstName.trim().length < 2) errors.push("First name must be at least 2 characters");
+    if (!form.lastName || form.lastName.trim().length < 2) errors.push("Last name must be at least 2 characters");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.push("Enter a valid email address");
+    if (!form.message || form.message.trim().length < 20) errors.push("Message must be at least 20 characters");
+    if (errors.length) { setResult({ ok: false, message: errors[0] }); return; }
     setSubmitting(true);
     setResult(null);
     try {
       const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, cfToken }) });
       const json = await res.json();
       setResult({ ok: res.ok, message: json.message || (res.ok ? "Sent" : "Failed") });
-      if (res.ok) setForm({ name: "", email: "", category: "Tech", message: "", ts: String(Date.now()), website: "" });
+      if (res.ok) setForm({ firstName: "", lastName: "", email: "", organization: "", category: "Tech", message: "", ts: String(Date.now()), website: "" });
     } catch (err) {
       setResult({ ok: false, message: "Network error" });
     } finally {
@@ -84,29 +94,55 @@ export default function ContactPage(){
             </a>
           </div>
 
-          <div ref={collRef} className="mt-10 md:mt-8 max-w-3xl mx-auto w-full overflow-hidden" style={{ maxHeight: 0 }}>
+          <div ref={collRef} className="mt-10 md:mt-8 max-w-lg sm:max-w-xl mx-auto w-full overflow-hidden" style={{ maxHeight: 0 }}>
             {showForm && (
-              <div ref={formWrapRef} id="form" className="border border-[#E5E2D8] bg-white/80 backdrop-blur-sm rounded-xl p-6 md:p-8 max-h-[60vh] overflow-auto">
-                <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div className="col-span-1">
-                    <label htmlFor="name" className="block text-xs font-mono uppercase tracking-widest text-[#8F877B] mb-2">Name</label>
-                    <input id="name" required value={form.name} onChange={(e)=>setForm({...form,name:e.target.value})} className="w-full border border-[#E5E2D8] rounded-md px-3 py-2 bg-white text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#D6D0C4]" />
+              <div ref={formWrapRef} id="form" className="border border-[#E5E2D8] bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 max-h-[60vh] overflow-auto">
+                <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* First Name */}
+                  <div className="col-span-1 relative">
+                    <input id="firstName" placeholder=" " required value={form.firstName} onChange={(e)=>setForm({...form,firstName:e.target.value})}
+                      className="peer w-full text-sm border-2 border-transparent focus:border-[#1C1917] rounded-2xl px-6 pt-5 pb-3 bg-white/80 text-[#1C1917] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1C1917]/25 hover:border-[#C8C2B4] hover:bg-white" />
+                    <label htmlFor="firstName" className="absolute left-6 top-1/2 -translate-y-1/2 text-[14px] text-[#8F877B] transition-all peer-focus:top-3.5 peer-focus:text-xs peer-focus:text-[#1C1917] peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-[14px] peer-[&:not(:placeholder-shown)]:top-3.5 peer-[&:not(:placeholder-shown)]:text-xs peer-[&:not(:placeholder-shown)]:text-[#1C1917]">First name</label>
+                    <User className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9C9487] transition-all peer-focus:text-[#1C1917] peer-focus:drop-shadow-[0_0_8px_rgba(28,25,23,0.25)]" />
                   </div>
-                <div className="col-span-1">
-                  <label htmlFor="email" className="block text-xs font-mono uppercase tracking-widest text-[#8F877B] mb-2">Email</label>
-                  <input id="email" type="email" required value={form.email} onChange={(e)=>setForm({...form,email:e.target.value})} className="w-full border border-[#E5E2D8] rounded-md px-3 py-2 bg-white text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#D6D0C4]" />
-                </div>
-                <div className="col-span-1">
-                  <label htmlFor="category" className="block text-xs font-mono uppercase tracking-widest text-[#8F877B] mb-2">Category</label>
-                  <select id="category" value={form.category} onChange={(e)=>setForm({...form,category:e.target.value as FormState["category"]})} className="w-full border border-[#E5E2D8] rounded-md px-3 py-2 bg-white text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#D6D0C4]">
-                    <option>Tech</option>
-                    <option>Food</option>
-                  </select>
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label htmlFor="message" className="block text-xs font-mono uppercase tracking-widest text-[#8F877B] mb-2">Message</label>
-                  <textarea id="message" rows={4} required value={form.message} onChange={(e)=>setForm({...form,message:e.target.value})} className="w-full border border-[#E5E2D8] rounded-md px-3 py-2 bg-white text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#D6D0C4]" />
-                </div>
+                  {/* Last Name */}
+                  <div className="col-span-1 relative">
+                    <input id="lastName" placeholder=" " required value={form.lastName} onChange={(e)=>setForm({...form,lastName:e.target.value})}
+                      className="peer w-full text-sm border-2 border-transparent focus:border-[#1C1917] rounded-2xl px-6 pt-5 pb-3 bg-white/80 text-[#1C1917] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1C1917]/25 hover:border-[#C8C2B4] hover:bg-white" />
+                    <label htmlFor="lastName" className="absolute left-6 top-1/2 -translate-y-1/2 text-[14px] text-[#8F877B] transition-all peer-focus:top-3.5 peer-focus:text-xs peer-focus:text-[#1C1917] peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-[14px] peer-[&:not(:placeholder-shown)]:top-3.5 peer-[&:not(:placeholder-shown)]:text-xs peer-[&:not(:placeholder-shown)]:text-[#1C1917]">Last name</label>
+                    <User className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9C9487] transition-all peer-focus:text-[#1C1917] peer-focus:drop-shadow-[0_0_8px_rgba(28,25,23,0.25)]" />
+                  </div>
+                  {/* Email */}
+                  <div className="col-span-1 relative">
+                    <input id="email" placeholder=" " type="email" required value={form.email} onChange={(e)=>setForm({...form,email:e.target.value})}
+                      className="peer w-full text-sm border-2 border-transparent focus:border-[#1C1917] rounded-2xl px-6 pt-5 pb-3 bg-white/80 text-[#1C1917] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1C1917]/25 hover:border-[#C8C2B4] hover:bg-white" />
+                    <label htmlFor="email" className="absolute left-6 top-1/2 -translate-y-1/2 text-[14px] text-[#8F877B] transition-all peer-focus:top-3.5 peer-focus:text-xs peer-focus:text-[#1C1917] peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-[14px] peer-[&:not(:placeholder-shown)]:top-3.5 peer-[&:not(:placeholder-shown)]:text-xs peer-[&:not(:placeholder-shown)]:text-[#1C1917]">Email</label>
+                    <Mail className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9C9487] transition-all peer-focus:text-[#1C1917] peer-focus:drop-shadow-[0_0_8px_rgba(28,25,23,0.25)]" />
+                  </div>
+                  {/* Organization (optional) */}
+                  <div className="col-span-1 relative">
+                    <input id="organization" placeholder=" " value={form.organization || ""} onChange={(e)=>setForm({...form,organization:e.target.value})}
+                      className="peer w-full text-sm border-2 border-transparent focus:border-[#1C1917] rounded-2xl px-6 pt-5 pb-3 bg-white/80 text-[#1C1917] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1C1917]/25 hover:border-[#C8C2B4] hover:bg-white" />
+                    <label htmlFor="organization" className="absolute left-6 top-1/2 -translate-y-1/2 text-[14px] text-[#8F877B] transition-all peer-focus:top-3.5 peer-focus:text-xs peer-focus:text-[#1C1917] peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-[14px] peer-[&:not(:placeholder-shown)]:top-3.5 peer-[&:not(:placeholder-shown)]:text-xs peer-[&:not(:placeholder-shown)]:text-[#1C1917]">Organization (optional)</label>
+                    <Building2 className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9C9487] transition-all peer-focus:text-[#1C1917] peer-focus:drop-shadow-[0_0_8px_rgba(28,25,23,0.25)]" />
+                  </div>
+                  {/* Category */}
+                  <div className="col-span-1 relative peer">
+                    <label htmlFor="category" className="block text-xs font-mono uppercase tracking-widest text-[#8F877B] mb-2">Category</label>
+                    <select id="category" value={form.category} onChange={(e)=>setForm({...form,category:e.target.value as FormState["category"]})}
+                      className="cursor-pointer appearance-none w-full text-sm border-2 border-transparent focus:border-[#1C1917] rounded-2xl pl-6 pr-10 py-4 bg-white/80 text-[#1C1917] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1C1917]/25 hover:border-[#C8C2B4] hover:bg-white">
+                      <option>Tech</option>
+                      <option>Food</option>
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9C9487] transition-transform peer-focus-within:rotate-180" />
+                  </div>
+                  {/* Message */}
+                  <div className="col-span-1 md:col-span-2 relative">
+                    <textarea id="message" placeholder=" " rows={5} minLength={20} required value={form.message} onChange={(e)=>setForm({...form,message:e.target.value})}
+                      className="peer w-full text-sm border-2 border-transparent focus:border-[#1C1917] rounded-2xl px-6 pt-7 pb-4 bg-white/80 text-[#1C1917] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1C1917]/25 hover:border-[#C8C2B4] hover:bg-white min-h-[140px] md:min-h-[180px]" />
+                    <label htmlFor="message" className="absolute left-6 top-6 text-[14px] text-[#8F877B] transition-all peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#1C1917] peer-placeholder-shown:top-6 peer-placeholder-shown:text-[14px] peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:text-xs peer-[&:not(:placeholder-shown)]:text-[#1C1917]">Message</label>
+                    <MessageSquareText className="absolute right-5 top-5 w-5 h-5 text-[#9C9487] transition-all peer-focus:text-[#1C1917] peer-focus:drop-shadow-[0_0_8px_rgba(28,25,23,0.25)]" />
+                  </div>
                 {/* honeypot and timestamp */}
                 <input type="hidden" name="ts" value={form.ts} />
                 <div className="hidden" aria-hidden>
