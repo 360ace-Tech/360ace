@@ -36,7 +36,7 @@
 .mobile-dock { transition: transform .35s ease, opacity .3s ease; }
 @media (min-width: 768px) {
   .mobile-dock { display: none !important; }
-  .header-hidden .mobile-dock { display: block !important; }
+  .header-hidden .mobile-dock { display: flex !important; }
 }
 
 /* Handwriting brand font helper */

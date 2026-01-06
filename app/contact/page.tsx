@@ -153,8 +153,13 @@ export default function ContactPage(){
                   <div ref={widgetRef} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}></div>
                 </div>
                   <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-4 mt-2">
-                    <button disabled={submitting} className="interactive px-6 py-3 rounded-md bg-[#1C1917] text-[#F9F7F2] hover:bg-[#2A2624] transition-colors">
-                      {submitting ? "Sending..." : "Send Message"}
+                    <button type="submit" disabled={submitting}
+                      aria-busy={submitting}
+                      className={`interactive group relative inline-flex items-center justify-center px-8 py-3 rounded-full bg-[#1C1917] text-[#F9F7F2] font-medium overflow-hidden shadow-sm transition-[box-shadow,transform] ${submitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md hover:-translate-y-0.5'}`}>
+                      <span className="relative z-10 transition-colors group-hover:text-[#1C1917]">
+                        {submitting ? 'Sending…' : 'Send Message'}
+                      </span>
+                      <span className="absolute inset-0 bg-[#F0ECE3] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out" />
                     </button>
                     {result && (
                       <span className={`text-sm ${result.ok ? "text-green-700" : "text-red-700"}`}>{result.message}</span>

@@ -313,10 +313,10 @@ function Hero({ ready }: { ready: boolean }) {
 
   return (
     <section ref={containerRef} className="min-h-[calc(100vh-96px)] md:min-h-[calc(100vh-112px)] w-full grid grid-rows-[1fr_auto] px-6 md:px-12 pt-24 md:pt-28 pb-10 md:pb-14 relative overflow-hidden">
-      <div className="row-start-1 row-end-2 self-center relative z-10 space-y-3 md:space-y-5 select-none max-w-screen-2xl">
+      <div className="row-start-1 row-end-2 self-center relative z-10 space-y-3 md:space-y-5 select-none max-w-none 2xl:max-w-none pr-[2vw]">
         {cfg.lines.map((words, idx) => (
-          <div key={idx} className="overflow-hidden">
-            <h1 className={`text-[14vw] md:text-[13vw] lg:text-[11vw] xl:text-[10.5vw] 2xl:text-[10vw] leading-[0.8] font-semibold tracking-tighter uppercase flex flex-wrap lg:flex-nowrap lg:whitespace-nowrap ${idx === 2 ? "text-glow" : ""}`}>
+          <div key={idx} className="overflow-hidden xl:overflow-visible py-[0.18em] xl:py-[0.22em] pr-[0.05em]">
+            <h1 className={`text-[14vw] md:text-[13vw] lg:text-[10.5vw] xl:text-[9.5vw] 2xl:text-[8.8vw] leading-[0.85] xl:leading-[0.9] 2xl:leading-[0.95] font-semibold tracking-tighter uppercase flex flex-wrap lg:flex-nowrap lg:whitespace-nowrap ${idx === 2 ? "text-glow" : ""}`}>
               {words.map((w, i) => (
                 <HeroWord key={`${idx}-${i}`} text={w.text} baseColor={baseMap[w.base]} hoverColor={hoverMap[w.hover]} />
               ))}
