@@ -313,7 +313,7 @@ function Hero({ ready }: { ready: boolean }) {
       <div className="row-start-1 row-end-2 self-center relative z-10 space-y-3 md:space-y-5 select-none max-w-screen-2xl">
         {cfg.lines.map((words, idx) => (
           <div key={idx} className="overflow-hidden">
-            <h1 className={`text-[14vw] md:text-[13vw] lg:text-[11vw] xl:text-[10vw] 2xl:text-[9vw] leading-[0.8] font-semibold tracking-tighter uppercase flex flex-wrap ${idx === 2 ? "text-glow" : ""}`}>
+            <h1 className={`text-[14vw] md:text-[13vw] lg:text-[13vw] xl:text-[13vw] 2xl:text-[13vw] leading-[0.8] font-semibold tracking-tighter uppercase flex flex-wrap lg:flex-nowrap lg:whitespace-nowrap ${idx === 2 ? "text-glow" : ""}`}>
               {words.map((w, i) => (
                 <HeroWord key={`${idx}-${i}`} text={w.text} baseColor={baseMap[w.base]} hoverColor={hoverMap[w.hover]} />
               ))}

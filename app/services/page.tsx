@@ -75,9 +75,9 @@ export default function ServicesPage(){
               </h1>
               <p className="eng-reveal text-[#7E786E] font-light leading-relaxed mb-8">{e.intro ?? "We don't just build websites; we construct digital ecosystems."}</p>
             </div>
-            <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-px bg-[#E5E2D8] border border-[#E5E2D8]">
+            <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-px bg-[#E5E2D8] border border-[#E5E2D8] items-stretch">
               {services.map((s, i)=> (
-                <div key={`${s.title}-${i}`}><ServiceCard icon={getIcon(i)} title={`${i+1}. ${s.title}`} desc={s.desc} /></div>
+                <div key={`${s.title}-${i}`} className="h-full"><ServiceCard icon={getIcon(i)} title={`${i+1}. ${s.title}`} desc={s.desc} /></div>
               ))}
             </div>
           </div>

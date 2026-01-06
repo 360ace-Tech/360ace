@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { inter, plexMono, handwrite } from "./fonts";
-import { Navbar, SiteFooter, MobileDock } from "./shared-ui";
+import { Navbar, SiteFooter, MobileDock, HeaderScrollHide } from "./shared-ui";
 import PageTransition from "@/components/page-transition";
 import CookieConsent from "@/components/cookie-consent";
 
@@ -19,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="scroll-smooth no-scrollbar" suppressHydrationWarning>
       <body suppressHydrationWarning className={`${inter.variable} ${plexMono.variable} ${handwrite.variable} antialiased bg-[#F9F7F2] text-[#292524] min-h-screen flex flex-col`}>
         <Navbar />
+        <HeaderScrollHide />
         <div className="flex-1 flex flex-col min-h-0">
           <PageTransition>{children}</PageTransition>
         </div>

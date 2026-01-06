@@ -99,6 +99,26 @@ export function Navbar({ logoRef, visible = true }: { logoRef?: React.RefObject<
   );
 }
 
+export function HeaderScrollHide() {
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const down = y > lastY && y > 64;
+        document.documentElement.classList.toggle('header-hidden', down);
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return null;
+}
+
 export function Scene({ isLoading = false, onReady }: { isLoading?: boolean; onReady?: () => void }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const meshMatRef = useRef<THREE.MeshBasicMaterial | null>(null);
