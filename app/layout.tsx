@@ -4,6 +4,7 @@ import { inter, plexMono, handwrite } from "./fonts";
 import { Navbar, SiteFooter, MobileDock, HeaderScrollHide } from "./shared-ui";
 import PageTransition from "@/components/page-transition";
 import CookieConsent from "@/components/cookie-consent";
+import GoogleAnalytics from "@/components/google-analytics";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://360ace.net";
 
@@ -115,6 +116,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body suppressHydrationWarning className={`${inter.variable} ${plexMono.variable} ${handwrite.variable} antialiased bg-[#F9F7F2] text-[#292524] min-h-screen flex flex-col`}>
+        <GoogleAnalytics />
         <Navbar />
         <HeaderScrollHide />
         <div className="flex-1 flex flex-col min-h-0">
