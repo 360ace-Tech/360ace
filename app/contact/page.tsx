@@ -57,18 +57,61 @@ export default function ContactPage(){
     if (!showForm || !turnstileReady) return;
     const t = setTimeout(() => {
       try {
-        type Turnstile = { render: (el: HTMLElement, opts: { sitekey?: string; theme?: 'light'|'dark'; callback?: (token: string) => void }) => string; reset?: (id?: string) => void; remove?: (id?: string) => void };
+        type TurnstileOptions = {
+          sitekey: string;
+          theme?: 'light' | 'dark';
+          callback?: (token: string) => void;
+          'expired-callback'?: () => void;
+          'error-callback'?: () => void;
+        };
+        type Turnstile = {
+          render: (el: HTMLElement, opts: TurnstileOptions) => string;
+          reset?: (id?: string) => void;
+          remove?: (id?: string) => void;
+          getResponse?: (id?: string) => string;
+        };
         const w = window as unknown as { turnstile?: Turnstile };
-        if (!w.turnstile || !widgetRef.current) return;
-        try { if (widgetIdRef.current && w.turnstile.remove) w.turnstile.remove(widgetIdRef.current); } catch {}
-        const runtimeSiteKey = document.getElementById('__config')?.getAttribute('data-ts-key') || process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
-        try { widgetRef.current.setAttribute('data-sitekey', runtimeSiteKey); } catch {}
+        if (!w.turnstile || !widgetRef.current) {
+          console.warn('[Turnstile] Widget or library not available');
+          return;
+        }
+        // Remove existing widget if present
+        try {
+          if (widgetIdRef.current && w.turnstile.remove) {
+            w.turnstile.remove(widgetIdRef.current);
+            widgetIdRef.current = null;
+          }
+        } catch (e) {
+          console.warn('[Turnstile] Failed to remove old widget:', e);
+        }
+        // Get sitekey from runtime config or fallback to build-time env
+        const runtimeSiteKey = document.getElementById('__config')?.getAttribute('data-ts-key') || '';
+        if (!runtimeSiteKey) {
+          console.error('[Turnstile] No sitekey found in runtime config');
+          return;
+        }
+        console.log('[Turnstile] Rendering widget with sitekey:', runtimeSiteKey.substring(0, 10) + '...');
+        // Render the widget
         widgetIdRef.current = w.turnstile.render(widgetRef.current, {
           sitekey: runtimeSiteKey,
           theme: 'light',
-          callback: (token: string) => setCfToken(token),
+          callback: (token: string) => {
+            console.log('[Turnstile] Token received');
+            setCfToken(token);
+          },
+          'expired-callback': () => {
+            console.log('[Turnstile] Token expired');
+            setCfToken('');
+          },
+          'error-callback': () => {
+            console.error('[Turnstile] Error occurred');
+            setCfToken('');
+          },
         });
-      } catch {}
+        console.log('[Turnstile] Widget rendered with ID:', widgetIdRef.current);
+      } catch (e) {
+        console.error('[Turnstile] Render error:', e);
+      }
     }, 300);
     return () => clearTimeout(t);
   }, [showForm, turnstileReady]);
@@ -104,26 +147,33 @@ export default function ContactPage(){
     if (!form.lastName || form.lastName.trim().length < 2) errors.push("Last name must be at least 2 characters");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.push("Enter a valid email address");
     if (!form.message || form.message.trim().length < 20) errors.push("Message must be at least 20 characters");
-    const sitekeyPresent = !!(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) || !!document.getElementById('__config')?.getAttribute('data-ts-key');
-    const needsCaptcha = sitekeyPresent && turnstileReady;
-    if (needsCaptcha && !cfToken) {
+    const runtimeSiteKey = document.getElementById('__config')?.getAttribute('data-ts-key') || '';
+    const needsCaptcha = !!runtimeSiteKey && turnstileReady;
+    let token = cfToken;
+    if (needsCaptcha && !token) {
       try {
         type Turnstile = { getResponse: (id?: string)=> string };
         const w = window as unknown as { turnstile?: Turnstile };
         const resp = w.turnstile?.getResponse(widgetIdRef.current || undefined);
         if (resp) {
-          setCfToken(resp);
+          token = resp;
+          console.log('[Turnstile] Retrieved token via getResponse');
         }
-      } catch {}
+      } catch (e) {
+        console.warn('[Turnstile] Failed to get response:', e);
+      }
     }
-    if (needsCaptcha && !cfToken) errors.push("Please verify you are human");
+    if (needsCaptcha && !token) {
+      console.error('[Turnstile] Captcha required but no token available');
+      errors.push("Please verify you are human");
+    }
     if (errors.length) { setResult({ ok: false, message: errors[0] }); return; }
     setSubmitting(true);
     setResult(null);
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       headers['x-requested-with'] = 'XMLHttpRequest';
-      const res = await fetch("/api/contact", { method: "POST", headers, body: JSON.stringify({ ...form, cfToken }) });
+      const res = await fetch("/api/contact", { method: "POST", headers, body: JSON.stringify({ ...form, cfToken: token, ['cf-turnstile-response']: token }) });
       const json = await res.json();
       setResult({ ok: res.ok, message: json.message || (res.ok ? "Sent" : "Failed") });
       if (res.ok) setForm({ firstName: "", lastName: "", email: "", organization: "", category: "Tech", message: "", ts: String(Date.now()), website: "" });
@@ -243,8 +293,17 @@ export default function ContactPage(){
           type Turnstile = { render: (el: HTMLElement, opts: { sitekey?: string; theme?: 'light'|'dark'; callback?: (token: string) => void }) => string };
           type W = Window & { turnstile?: Turnstile };
           const w = window as W;
-          if (w.turnstile) setTurnstileReady(true);
-        } catch {}
+          if (w.turnstile) {
+            console.log('[Turnstile] Library loaded successfully');
+            setTurnstileReady(true);
+          } else {
+            console.error('[Turnstile] Library loaded but turnstile object not found');
+          }
+        } catch (e) {
+          console.error('[Turnstile] Script onLoad error:', e);
+        }
+      }} onError={(e) => {
+        console.error('[Turnstile] Failed to load script:', e);
       }} />
       <Script id="cf-callback" strategy="afterInteractive">{`
         (function(){

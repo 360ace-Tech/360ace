@@ -10,6 +10,10 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+  /* Offline-safe font variable fallbacks */
+  .font-sans { --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+  .font-mono { --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
   /* Effects used by the landing */
   .clip-text-reveal { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
   .text-glow { text-shadow: 0 0 20px rgba(0,0,0,0.05); }

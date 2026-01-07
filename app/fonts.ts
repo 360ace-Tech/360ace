@@ -1,18 +1,8 @@
-import { Inter, IBM_Plex_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
-export const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-sans",
-});
-
-export const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400","500","600","700"],
-  display: "swap",
-  variable: "--font-mono",
-});
+// Offline-safe fallback: map variables to system stacks via utility classes in globals.css
+export const inter = { variable: "font-sans" } as const;
+export const plexMono = { variable: "font-mono" } as const;
 
 export const handwrite = localFont({
   src: "./fonts/AmsterdamHandwriting.ttf",

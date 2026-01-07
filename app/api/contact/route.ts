@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     // Optional Cloudflare Turnstile verification
     const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
     const publicSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    const cfToken: string | undefined = body && (body.cfToken as string);
+    const cfToken: string | undefined = body && ((body.cfToken as string) || (body["cf-turnstile-response"] as string));
     const requireCaptcha = Boolean(
       turnstileSecret && publicSiteKey && (process.env.TURNSTILE_REQUIRE === '1' || process.env.NODE_ENV === 'production')
     );
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: `Email is not configured on server.${devDetail}` }, { status: 500 });
     }
 
-    const secureFlag = false;
+    // no SMTP configuration here; using MailerSend REST
 
     const fullName = `${data.firstName} ${data.lastName}`.trim();
     const org = (data.organization || '').trim();
