@@ -48,6 +48,8 @@ export default function ContactPage(){
       try { setCfToken((e as CustomEvent<string>).detail || ""); } catch {}
     };
     window.addEventListener('cf-token', onToken as EventListener);
+    const onReady = () => setTurnstileReady(true);
+    window.addEventListener('cf-ready', onReady as EventListener);
     return () => window.removeEventListener('cf-token', onToken as EventListener);
   }, []);
 
@@ -59,8 +61,10 @@ export default function ContactPage(){
         const w = window as unknown as { turnstile?: Turnstile };
         if (!w.turnstile || !widgetRef.current) return;
         try { if (widgetIdRef.current && w.turnstile.remove) w.turnstile.remove(widgetIdRef.current); } catch {}
+        const runtimeSiteKey = document.getElementById('__config')?.getAttribute('data-ts-key') || process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
+        try { widgetRef.current.setAttribute('data-sitekey', runtimeSiteKey); } catch {}
         widgetIdRef.current = w.turnstile.render(widgetRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+          sitekey: runtimeSiteKey,
           theme: 'light',
           callback: (token: string) => setCfToken(token),
         });
@@ -100,8 +104,18 @@ export default function ContactPage(){
     if (!form.lastName || form.lastName.trim().length < 2) errors.push("Last name must be at least 2 characters");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.push("Enter a valid email address");
     if (!form.message || form.message.trim().length < 20) errors.push("Message must be at least 20 characters");
-    const sitekeyPresent = !!(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+    const sitekeyPresent = !!(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) || !!document.getElementById('__config')?.getAttribute('data-ts-key');
     const needsCaptcha = sitekeyPresent && turnstileReady;
+    if (needsCaptcha && !cfToken) {
+      try {
+        type Turnstile = { getResponse: (id?: string)=> string };
+        const w = window as unknown as { turnstile?: Turnstile };
+        const resp = w.turnstile?.getResponse(widgetIdRef.current || undefined);
+        if (resp) {
+          setCfToken(resp);
+        }
+      } catch {}
+    }
     if (needsCaptcha && !cfToken) errors.push("Please verify you are human");
     if (errors.length) { setResult({ ok: false, message: errors[0] }); return; }
     setSubmitting(true);
@@ -191,7 +205,7 @@ export default function ContactPage(){
                   <input id="website" autoComplete="off" tabIndex={-1} value={form.website} onChange={(e)=>setForm({...form,website:e.target.value})} />
                 </div>
                 <div className="col-span-1 md:col-span-2">
-                  <div ref={widgetRef} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''} style={{ minHeight: 44 }}></div>
+                  <div ref={widgetRef} className="cf-turnstile" style={{ minHeight: 44 }}></div>
                 </div>
                   <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-4 mt-2 relative">
                     <button type="submit" disabled={submitting}
@@ -232,6 +246,12 @@ export default function ContactPage(){
           if (w.turnstile) setTurnstileReady(true);
         } catch {}
       }} />
+      <Script id="cf-callback" strategy="afterInteractive">{`
+        (function(){
+          window.__cfToken = function(token){ try{ window.dispatchEvent(new CustomEvent('cf-token', { detail: token })) }catch(e){} };
+          if (window.turnstile) { try{ window.dispatchEvent(new Event('cf-ready')); }catch(e){} }
+        })();
+      `}</Script>
       <Script id="cf-retry-hook" strategy="afterInteractive">{`
         (function(){
           function ping(){ try{ if (window.turnstile) window.dispatchEvent(new Event('cf-ready')); }catch(e){} }

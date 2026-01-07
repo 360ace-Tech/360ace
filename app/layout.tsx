@@ -48,6 +48,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="flex-1 flex flex-col min-h-0">
           <PageTransition>{children}</PageTransition>
         </div>
+        {/* Runtime-exposed config for client side (avoids build-time inlining issues) */}
+        <div id="__config" data-ts-key={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''} hidden />
         <MobileDock />
         <SiteFooter />
         <CookieConsent />
