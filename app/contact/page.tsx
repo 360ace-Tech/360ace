@@ -53,11 +53,20 @@ export default function ContactPage(){
 
   useEffect(() => {
     if (!showForm || !turnstileReady) return;
-    try {
-      // @ts-expect-error global helper from Script
-      const id = window.__renderCF?.();
-      if (id) widgetIdRef.current = id as string;
-    } catch {}
+    const t = setTimeout(() => {
+      try {
+        type Turnstile = { render: (el: HTMLElement, opts: { sitekey?: string; theme?: 'light'|'dark'; callback?: (token: string) => void }) => string; reset?: (id?: string) => void; remove?: (id?: string) => void };
+        const w = window as unknown as { turnstile?: Turnstile };
+        if (!w.turnstile || !widgetRef.current) return;
+        try { if (widgetIdRef.current && w.turnstile.remove) w.turnstile.remove(widgetIdRef.current); } catch {}
+        widgetIdRef.current = w.turnstile.render(widgetRef.current, {
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+          theme: 'light',
+          callback: (token: string) => setCfToken(token),
+        });
+      } catch {}
+    }, 300);
+    return () => clearTimeout(t);
   }, [showForm, turnstileReady]);
 
   useEffect(() => {
@@ -92,12 +101,15 @@ export default function ContactPage(){
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.push("Enter a valid email address");
     if (!form.message || form.message.trim().length < 20) errors.push("Message must be at least 20 characters");
     const sitekeyPresent = !!(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
-    if (sitekeyPresent && !cfToken) errors.push("Please verify you are human");
+    const needsCaptcha = sitekeyPresent && turnstileReady;
+    if (needsCaptcha && !cfToken) errors.push("Please verify you are human");
     if (errors.length) { setResult({ ok: false, message: errors[0] }); return; }
     setSubmitting(true);
     setResult(null);
     try {
-      const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, cfToken }) });
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      headers['x-requested-with'] = 'XMLHttpRequest';
+      const res = await fetch("/api/contact", { method: "POST", headers, body: JSON.stringify({ ...form, cfToken }) });
       const json = await res.json();
       setResult({ ok: res.ok, message: json.message || (res.ok ? "Sent" : "Failed") });
       if (res.ok) setForm({ firstName: "", lastName: "", email: "", organization: "", category: "Tech", message: "", ts: String(Date.now()), website: "" });
@@ -179,7 +191,7 @@ export default function ContactPage(){
                   <input id="website" autoComplete="off" tabIndex={-1} value={form.website} onChange={(e)=>setForm({...form,website:e.target.value})} />
                 </div>
                 <div className="col-span-1 md:col-span-2">
-                  <div ref={widgetRef} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}></div>
+                  <div ref={widgetRef} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''} style={{ minHeight: 44 }}></div>
                 </div>
                   <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-4 mt-2 relative">
                     <button type="submit" disabled={submitting}
@@ -193,12 +205,16 @@ export default function ContactPage(){
                     {result && (
                       <div role="status" aria-live="polite"
                         className={`absolute right-0 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 px-3 py-2 rounded-full shadow-sm border text-sm ${result.ok ? 'bg-[#EAF6EA] border-[#B7E2B7] text-[#0F5132]' : 'bg-[#FDECEC] border-[#F5C2C7] text-[#842029]'}`}>
-                        {result.ok ? (
-                          <Check className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4" />
-                        )}
                         <span>{result.message}</span>
+                        {result.ok ? (
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-current ml-1">
+                            <Check className="w-3 h-3 animate-spin" />
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-current ml-1">
+                            <AlertCircle className="w-3 h-3" />
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
@@ -210,27 +226,17 @@ export default function ContactPage(){
       </main>
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" onLoad={() => {
         try {
-          type Turnstile = { render: (el: HTMLElement, opts: { sitekey?: string; theme?: 'light'|'dark'; callback?: (token: string) => void }) => string; reset: (id?: string) => void };
+          type Turnstile = { render: (el: HTMLElement, opts: { sitekey?: string; theme?: 'light'|'dark'; callback?: (token: string) => void }) => string };
           type W = Window & { turnstile?: Turnstile };
           const w = window as W;
           if (w.turnstile) setTurnstileReady(true);
         } catch {}
       }} />
-      <Script id="turnstile-render" strategy="afterInteractive">{`
-        window.__renderCF = function() {
-          try {
-            var el = document.querySelector('.cf-turnstile');
-            if (!el || !window.turnstile) return null;
-            el.innerHTML = '';
-            return window.turnstile.render(el, { sitekey: '${process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''}', theme: 'light', callback: function(token){ try{ window.dispatchEvent(new CustomEvent('cf-token',{detail:token})); }catch(e){} } });
-          } catch(e) { return null; }
-        }
-      `}</Script>
-      <Script id="turnstile-hooks" strategy="afterInteractive">{`
+      <Script id="cf-retry-hook" strategy="afterInteractive">{`
         (function(){
-          function render(){ if (window.__renderCF) window.__renderCF(); }
-          window.addEventListener('page:revealed', render);
-          document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible') render(); });
+          function ping(){ try{ if (window.turnstile) window.dispatchEvent(new Event('cf-ready')); }catch(e){} }
+          window.addEventListener('page:revealed', ping);
+          document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible') ping(); });
         })();
       `}</Script>
     </div>

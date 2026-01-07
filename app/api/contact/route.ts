@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+// import { readFile } from "fs/promises";
+// import path from "path";
 import { z } from "zod";
 
 function escapeHtml(input: string): string {
@@ -47,6 +49,49 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+
+    // Optional origin allowlist (more tolerant matching)
+    const origin = req.headers.get('origin') || '';
+    const referer = req.headers.get('referer') || '';
+    const requestOrigin = (() => { try { return new URL(req.url).origin; } catch { return ''; } })();
+    const rawAllowed = (process.env.CONTACT_ALLOWED_ORIGINS || process.env.NEXT_PUBLIC_SITE_URL || '')
+      .split(',').map(s => s.trim()).filter(Boolean);
+    const allowed = [...rawAllowed];
+    if (process.env.NODE_ENV !== 'production' && rawAllowed.length) {
+      // Include common local dev origins to reduce friction
+      allowed.push('http://localhost', 'http://localhost:3000', 'http://127.0.0.1');
+    }
+    const norm = (s: string) => {
+      try { return new URL(s).origin; } catch { return s.replace(/\/$/, ''); }
+    };
+    const candidates = [origin, referer, requestOrigin].filter(Boolean).map(norm);
+    const allowedSet = new Set(allowed.map(norm));
+    if (allowedSet.size) {
+      const ok = candidates.some(c => {
+        // Allow wildcard
+        if (allowed.includes('*')) return true;
+        for (const a of allowedSet) {
+          if (c.startsWith(a)) return true;
+        }
+        return false;
+      });
+      if (!ok) {
+        return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+      }
+    }
+
+    // Optional CSRF-style header check
+    const expectedXRW = process.env.CONTACT_REQUESTED_WITH;
+    if (expectedXRW) {
+      const xrw = (req.headers.get('x-requested-with') || '').toLowerCase();
+      if (xrw !== expectedXRW.toLowerCase()) {
+        // In non-production, do not hard block; surface 400 to hint misconfig
+        if (process.env.NODE_ENV !== 'production') {
+          return NextResponse.json({ message: 'Bad request (X-Requested-With mismatch)' }, { status: 400 });
+        }
+        return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+      }
+    }
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ message: "Invalid submission" }, { status: 400 });
@@ -67,13 +112,17 @@ export async function POST(req: NextRequest) {
 
     // Optional Cloudflare Turnstile verification
     const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+    const publicSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     const cfToken: string | undefined = body && (body.cfToken as string);
-    if (turnstileSecret) {
+    const requireCaptcha = Boolean(
+      turnstileSecret && publicSiteKey && (process.env.TURNSTILE_REQUIRE === '1' || process.env.NODE_ENV === 'production')
+    );
+    if (requireCaptcha) {
       if (!cfToken) {
         return NextResponse.json({ message: "Captcha required" }, { status: 400 });
       }
       try {
-        const form = new URLSearchParams({ secret: turnstileSecret, response: cfToken, remoteip: ip as string });
+        const form = new URLSearchParams({ secret: turnstileSecret as string, response: cfToken as string, remoteip: ip as string });
         const resp = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -93,34 +142,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Send email via nodemailer
-    let nodemailer: unknown;
-    try {
-      nodemailer = (await import("nodemailer")).default;
-    } catch {
-      return NextResponse.json({ message: "Email service not available. Please install 'nodemailer' dependency." }, { status: 500 });
-    }
+    // Determine mail provider (MailerSend preferred)
+    const { MAILERSEND_API_KEY, CONTACT_EMAIL_FROM } = process.env as Record<string, string | undefined>;
 
-    const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, CONTACT_EMAIL_FROM, CONTACT_EMAIL_TO } = process.env as Record<string, string | undefined>;
-
-    const missing: string[] = [];
-    if (!SMTP_HOST) missing.push('SMTP_HOST');
-    if (!SMTP_PORT) missing.push('SMTP_PORT');
-    if (!SMTP_USER) missing.push('SMTP_USER');
-    if (!SMTP_PASS) missing.push('SMTP_PASS');
-    if (!CONTACT_EMAIL_FROM) missing.push('CONTACT_EMAIL_FROM');
-    if (!CONTACT_EMAIL_TO) missing.push('CONTACT_EMAIL_TO');
-    if (missing.length) {
-      const devDetail = process.env.NODE_ENV !== 'production' ? ` Missing: ${missing.join(', ')}` : '';
+    if (!MAILERSEND_API_KEY || !CONTACT_EMAIL_FROM) {
+      const missing = [!MAILERSEND_API_KEY ? 'MAILERSEND_API_KEY' : null, !CONTACT_EMAIL_FROM ? 'CONTACT_EMAIL_FROM' : null].filter(Boolean).join(', ');
+      const devDetail = process.env.NODE_ENV !== 'production' ? ` Missing: ${missing}` : '';
       return NextResponse.json({ message: `Email is not configured on server.${devDetail}` }, { status: 500 });
     }
 
-    const transporter = (nodemailer as { createTransport: (opts: { host: string; port: number; secure: boolean; auth: { user: string; pass: string } }) => { sendMail: (o: { from: string; to: string; subject: string; text: string; html?: string; replyTo?: string }) => Promise<unknown> } }).createTransport({
-      host: SMTP_HOST!,
-      port: Number(SMTP_PORT),
-      secure: Number(SMTP_PORT) === 465,
-      auth: { user: SMTP_USER!, pass: SMTP_PASS! },
-    });
+    const secureFlag = false;
 
     const fullName = `${data.firstName} ${data.lastName}`.trim();
     const org = (data.organization || '').trim();
@@ -128,14 +159,14 @@ export async function POST(req: NextRequest) {
     const text = `Name: ${fullName}\nEmail: ${data.email}\nCategory: ${data.category}${org ? `\nOrganization: ${org}` : ''}\n---\n${data.message}`;
 
     // HTML template
-    const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
-    const logo = `${origin}/logo-dark.png`;
+    const originAbs = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
+    const logoSrc = `${originAbs}/logo-dark.png`;
     const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#f7f6f2; padding:24px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #e8e5da;overflow:hidden">
         <tr>
           <td style="padding:24px 24px 8px 24px; border-bottom:1px solid #eeeadd;">
-            <img src="${logo}" alt="360ace.NET" height="28" style="display:block; height:28px; width:auto;" />
+            <img src="${logoSrc}" alt="360ace.NET" height="28" style="display:block; height:28px; width:auto;" />
             <div style="font-size:12px;color:#7e786e;letter-spacing:0.18em;margin-top:6px;text-transform:uppercase">Contact Inquiry</div>
           </td>
         </tr>
@@ -167,20 +198,52 @@ export async function POST(req: NextRequest) {
       </table>
     </div>`;
 
+    // Helper to parse "Name <email@>" or plain email
+    const parseAddress = (addr: string): { email: string; name?: string } => {
+      const m = addr.match(/^\s*([^<]*)<([^>]+)>\s*$/);
+      if (m) { const name = m[1].trim(); const email = m[2].trim(); return { email, name: name || undefined }; }
+      return { email: addr.trim() };
+    };
+
+    // Resolve recipient by category
+    const toEmail = data.category === 'Food' ? 'food@360ace.food' : 'info@360ace.tech';
+    if (!MAILERSEND_API_KEY) {
+      if (process.env.NODE_ENV !== 'production') {
+        return NextResponse.json({ message: 'MailerSend API key not configured' }, { status: 500 });
+      }
+      return NextResponse.json({ message: 'Email send failed' }, { status: 500 });
+    }
     try {
-      await transporter.sendMail({
-        from: CONTACT_EMAIL_FROM!,
-        to: CONTACT_EMAIL_TO!,
-        subject,
-        text,
-        html,
-        replyTo: data.email,
+      const { email: fromEmail, name: fromName } = parseAddress(CONTACT_EMAIL_FROM!);
+      const msRes = await fetch('https://api.mailersend.com/v1/email', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${MAILERSEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: { email: fromEmail, name: fromName },
+          to: [{ email: toEmail }],
+          subject,
+          text,
+          html,
+          reply_to: { email: data.email },
+          settings: { track_clicks: false, track_opens: false },
+        }),
       });
+      if (!msRes.ok) {
+        const body = await msRes.text().catch(() => '');
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('MailerSend API error:', msRes.status, body);
+          return NextResponse.json({ message: `Email send failed (MailerSend): ${msRes.status}` }, { status: 500 });
+        }
+        return NextResponse.json({ message: 'Email send failed' }, { status: 500 });
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
       if (process.env.NODE_ENV !== 'production') {
-        console.error('Email send error:', err);
-        return NextResponse.json({ message: `Email send failed: ${msg}` }, { status: 500 });
+        console.error('MailerSend error:', err);
+        return NextResponse.json({ message: `Email send failed (MailerSend): ${msg}` }, { status: 500 });
       }
       return NextResponse.json({ message: 'Email send failed' }, { status: 500 });
     }
