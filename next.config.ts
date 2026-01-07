@@ -23,6 +23,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Docker deployments
+  output: process.env.DOCKER_BUILD === "true" ? "standalone" : undefined,
+
+  // Optimize for different deployment environments
+  poweredByHeader: false,
+  compress: true,
+
   async redirects() {
     return [
       {
@@ -44,6 +51,12 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
     ];
+  },
+
+  // Image optimization - compatible with all platforms
+  images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60,
   },
 };
 

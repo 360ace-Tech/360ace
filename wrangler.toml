@@ -1,0 +1,5 @@
+name = "360ace-net"
+compatibility_date = "2026-01-07"
+
+# Cloudflare Pages configuration
+# Uses Next.js static output for deployment
