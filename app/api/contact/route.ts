@@ -158,15 +158,22 @@ export async function POST(req: NextRequest) {
     const subject = `New ${data.category} inquiry from ${fullName}${org ? ` (${org})` : ''}`;
     const text = `Name: ${fullName}\nEmail: ${data.email}\nCategory: ${data.category}${org ? `\nOrganization: ${org}` : ''}\n---\n${data.message}`;
 
-    // HTML template
-    const originAbs = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
-    const logoSrc = `${originAbs}/logo-dark.png`;
+    // HTML template — prefer public site URL to avoid localhost links in email
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://360ace.net').replace(/\/$/, '');
+    const logoSrc = `${siteUrl}/logo-dark.png`;
     const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#f7f6f2; padding:24px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #e8e5da;overflow:hidden">
         <tr>
           <td style="padding:24px 24px 8px 24px; border-bottom:1px solid #eeeadd;">
-            <img src="${logoSrc}" alt="360ace.NET" height="28" style="display:block; height:28px; width:auto;" />
+            <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+              <td style="vertical-align:middle; padding-right:10px;">
+                <img src="${logoSrc}" alt="360ace.NET" height="28" style="display:block; height:28px; width:auto; border:0; outline:none; text-decoration:none;" />
+              </td>
+              <td style="vertical-align:middle;">
+                <div style="font-size:16px; color:#1c1917; font-weight:700; letter-spacing:0.02em;">360ace.NET</div>
+              </td>
+            </tr></table>
             <div style="font-size:12px;color:#7e786e;letter-spacing:0.18em;margin-top:6px;text-transform:uppercase">Contact Inquiry</div>
           </td>
         </tr>
