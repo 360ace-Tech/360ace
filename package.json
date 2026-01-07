@@ -7,9 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit",
-    "build:docker": "DOCKER_BUILD=true npm run build",
-    "postinstall": "test -f .env.local || (test -f .env.example && cp .env.example .env.local) || true"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
