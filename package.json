@@ -9,7 +9,6 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "build:docker": "DOCKER_BUILD=true npm run build",
-    "deploy:cloudflare": "wrangler pages deploy .next --project-name=360ace-net",
     "postinstall": "test -f .env.local || (test -f .env.example && cp .env.example .env.local) || true"
   },
   "dependencies": {
@@ -45,7 +44,6 @@
     "playwright": "^1.55.1",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "wrangler": "^4.57.0"
+    "typescript": "^5"
   }
 }
