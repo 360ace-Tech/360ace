@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+/* Basic global resets and page-specific tweaks for the landing */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; min-height: 100vh; }
+
+  /* Hide default scrollbar across browsers */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Offline-safe font variable fallbacks */
+  .font-sans { --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+  .font-mono { --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+  /* Effects used by the landing */
+  .clip-text-reveal { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+  .text-glow { text-shadow: 0 0 20px rgba(0,0,0,0.05); }
+  .glass-panel { background: rgba(249, 247, 242, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(229, 226, 216, 0.5); }
+  .interactive { cursor: none; }
+  @media (pointer: fine) and (hover: hover) {
+    body { cursor: none; }
+    .interactive { cursor: none; }
+  }
+  /* Hide header during home preloading (but keep layout for accurate FLIP) */
+  .preload-hide-header .site-nav { visibility: hidden; opacity: 0; pointer-events: none; }
+  .preload-hide-header .site-footer { visibility: hidden; opacity: 0; pointer-events: none; }
+  ::selection { background: #D6D0C4; color: #1C1917; }
+}
+
+/* Page transition overlays */
+.transition-overlay { position: fixed; inset: 0; display: none; grid-template-columns: repeat(20, 1fr); z-index: 80; pointer-events: none; }
+.transition-overlay .block { background: #E5E2D8; height: 100vh; transform: scaleX(0); }
+.logo-overlay { position: fixed; inset: 0; display: none; place-items: center; z-index: 90; pointer-events: none; opacity: 0; }
+.logo-overlay .logo { max-width: 240px; width: 40vw; }
+
+/* Header hide-on-scroll and mobile dock behavior */
+.site-nav { transition: transform .35s ease, opacity .3s ease; }
+.header-hidden .site-nav { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+.mobile-dock { transition: transform .35s ease, opacity .3s ease; }
+@media (min-width: 768px) {
+  .mobile-dock { display: none !important; }
+  .header-hidden .mobile-dock { display: flex !important; }
+}
+
+/* Handwriting brand font helper */
+.font-hand { font-family: var(--font-hand), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; font-weight: 400; }
+
+/* Subtle light gradient for impact section */
+.impact-gradient { background: linear-gradient(180deg, #F9F7F2 0%, #F2EFE8 100%); }
+
+/* Test.html-style handwriting animation used in transition */
+.logo-overlay .hw-svg text { font-family: var(--font-hand), cursive; }
+.logo-overlay .hw-svg text tspan {
+  fill: none;
+  stroke: #1C1917;
+  stroke-width: 1.1px;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+}
+@keyframes hw-write { to { stroke-dashoffset: 0; } }
+@keyframes hw-fill { to { fill: #1C1917; } }

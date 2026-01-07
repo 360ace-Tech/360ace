@@ -1,0 +1,35 @@
+{
+  "lines": [
+    [
+      { "text": "TECH", "base": "dark", "hover": "muted" },
+      {
+        "text": "AND",
+        "base": "dark",
+        "hover": "muted"
+      },
+      { "text": "FOOD", "base": "dark", "hover": "muted" }
+    ],
+    [
+      { "text": "SYSTEMS", "base": "cream", "hover": "creamMuted" }
+    ],
+    [
+      {
+        "text": "UNDER",
+        "base": "dark",
+        "hover": "muted"
+      },
+      { "text": "ONE", "base": "dark", "hover": "muted" },
+      {
+        "text": "HUB",
+        "base": "dark",
+        "hover": "muted"
+      }
+    ]
+  ],
+  "bottomCopy": "360ace.NET Cloud-native, data and AI platform engineering, combined with Food quality, regulatory, and capability programs. We help teams deliver trusted services end-to-end."
+  ,
+  "ctas": [
+    { "label": "Visit TECH", "href": "https://360ace.tech" },
+    { "label": "Visit FOOD", "href": "https://360ace.food" }
+  ]
+}

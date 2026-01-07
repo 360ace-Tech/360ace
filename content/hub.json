@@ -1,0 +1,10 @@
+{
+  "hero": {
+    "eyebrow": "Consultancy without boarders",
+    "title": "IT services, food systems expertise under one  hub.",
+    "description": "Cloud-native, data and AI platform engineering. Food quality, regulatory, and capability programs. We help teams deliver trusted services end-to-end.",
+    "techCta": { "label": "Explore Technology", "href": "https://360ace.tech" },
+    "foodCta": { "label": "Explore Food Systems", "href": "https://360ace.food" }
+  }
+}
+
