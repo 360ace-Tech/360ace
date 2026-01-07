@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
-import path from "path";
 import { z } from "zod";
 
 function escapeHtml(input: string): string {
@@ -162,18 +160,8 @@ export async function POST(req: NextRequest) {
     const subject = `New ${data.category} inquiry from ${fullName}${org ? ` (${org})` : ''}`;
     const text = `Name: ${fullName}\nEmail: ${data.email}\nCategory: ${data.category}${org ? `\nOrganization: ${org}` : ''}\n---\n${data.message}`;
 
-    // Determine logo: prefer embedding inline via CID; fallback to absolute URL
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://360ace.net').replace(/\/$/, '');
-    const logoPath = path.join(process.cwd(), 'public', 'logo-dark.png');
-    const logoCid = 'logo-dark';
-    let logoDataBase64: string | null = null;
-    try {
-      const buf = await readFile(logoPath);
-      logoDataBase64 = buf.toString('base64');
-    } catch {
-      logoDataBase64 = null;
-    }
-    const brandImgSrc = logoDataBase64 ? `cid:${logoCid}` : `${siteUrl}/logo-dark.png`;
+    const brandImgSrc = `${siteUrl}/logo-dark.png`;
     const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#f7f6f2; padding:24px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #e8e5da;overflow:hidden">
@@ -249,14 +237,6 @@ export async function POST(req: NextRequest) {
           html,
           reply_to: { email: data.email },
           settings: { track_clicks: false, track_opens: false },
-          attachments: logoDataBase64 ? [
-            {
-              content: logoDataBase64,
-              filename: 'logo-dark.png',
-              disposition: 'inline',
-              id: logoCid
-            }
-          ] : undefined,
         }),
       });
       if (!msRes.ok) {
@@ -286,4 +266,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Unexpected error" }, { status: 500 });
   }
 }
-export const runtime = 'nodejs';
+export const runtime = 'edge';
