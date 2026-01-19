@@ -1,22 +1,24 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PenTool, Search, Wrench, Activity, TrendingUp } from "lucide-react";
 import engagement from "@/content/engagement.json";
 import impact from "@/content/impact.json";
+import { CustomCursor, GridLines } from "../shared-ui";
 
 gsap.registerPlugin(ScrollTrigger);
 
-function CustomCursor(){
-  const c=useRef<HTMLDivElement|null>(null), f=useRef<HTMLDivElement|null>(null);
-  useEffect(()=>{const fine=window.matchMedia('(pointer: fine)').matches&&window.matchMedia('(hover: hover)').matches;if(!fine)return;const mv=(e:MouseEvent)=>{if(!c.current||!f.current)return;gsap.to(c.current,{x:e.clientX,y:e.clientY,duration:.1});gsap.to(f.current,{x:e.clientX,y:e.clientY,duration:.5,ease:"power2.out"})};window.addEventListener("mousemove",mv);return()=>window.removeEventListener("mousemove",mv)},[]);
-  return(<><div ref={c} className="hidden md:block fixed top-0 left-0 w-2 h-2 bg-[#1C1917] rounded-full pointer-events-none z-[100] -translate-x-1/2 -translate-y-1/2"/><div ref={f} className="hidden md:block fixed top-0 left-0 w-8 h-8 border border-[#D6D0C4] rounded-full pointer-events-none z-[99] -translate-x-1/2 -translate-y-1/2"/></>)}
-
-function GridLines(){return(<div className="fixed inset-0 w-full h-full pointer-events-none z-0 border-x border-[#E5E2D880] flex justify-between"><div className="h-full w-px bg-[#E5E2D84D] hidden md:block"/><div className="h-full w-px bg-[#E5E2D84D]"/><div className="h-full w-px bg-[#E5E2D84D] hidden md:block"/></div>)}
-
-function ServiceCard({icon,title,desc}:{icon:React.ReactNode,title:string,desc:string}){return(<div className="interactive bg-white border border-[#E5E2D8] p-8 hover:border-[#C8C2B6] hover:bg-[#F0ECE3] transition-all duration-300 group"><div className="bg-[#E5E2D8] w-12 h-12 flex items-center justify-center rounded-full mb-6 group-hover:scale-110 transition-transform text-[#1C1917]">{icon}</div><h3 className="text-xl text-[#1C1917] font-medium mb-3 tracking-tight">{title}</h3><p className="text-xs md:text-sm text-[#7E786E] leading-relaxed group-hover:text-[#292524] transition-colors">{desc}</p></div>)}
+function ServiceCard({icon,title,desc}:{icon:React.ReactNode,title:string,desc:string}){
+  return(
+    <div className="interactive bg-white border border-[#E5E2D8] p-6 md:p-8 hover:border-[#C8C2B6] hover:bg-[#F0ECE3] transition-all duration-300 group h-full flex flex-col">
+      <div className="bg-[#E5E2D8] w-12 h-12 flex items-center justify-center rounded-full mb-4 md:mb-6 group-hover:scale-110 transition-transform text-[#1C1917] flex-shrink-0">{icon}</div>
+      <h3 className="text-lg md:text-xl text-[#1C1917] font-medium mb-2 md:mb-3 tracking-tight">{title}</h3>
+      <p className="text-xs md:text-sm text-[#7E786E] leading-relaxed group-hover:text-[#292524] transition-colors flex-grow">{desc}</p>
+    </div>
+  );
+}
 
 // Block reveal only (no character splitting)
 
@@ -75,9 +77,9 @@ export default function ServicesPage(){
               </h1>
               <p className="eng-reveal text-[#7E786E] font-light leading-relaxed mb-8">{e.intro ?? "We don't just build websites; we construct digital ecosystems."}</p>
             </div>
-            <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-px bg-[#E5E2D8] border border-[#E5E2D8] items-stretch">
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#E5E2D8] border border-[#E5E2D8]">
               {services.map((s, i)=> (
-                <div key={`${s.title}-${i}`} className="h-full"><ServiceCard icon={getIcon(i)} title={`${i+1}. ${s.title}`} desc={s.desc} /></div>
+                <div key={`${s.title}-${i}`} className="min-w-0"><ServiceCard icon={getIcon(i)} title={`${i+1}. ${s.title}`} desc={s.desc} /></div>
               ))}
             </div>
           </div>

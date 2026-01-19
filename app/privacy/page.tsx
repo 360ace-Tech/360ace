@@ -1,8 +1,13 @@
 "use client";
 
+import { CustomCursor, GridLines } from "../shared-ui";
+
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen pt-24 pb-16 px-6 md:px-12">
+    <div className="relative w-full">
+      <CustomCursor />
+      <GridLines />
+      <main className="relative z-10 min-h-screen pt-24 pb-16 px-6 md:px-12">
       <h1 className="text-4xl md:text-5xl text-[#1C1917] font-semibold tracking-tight mb-6">Privacy Policy</h1>
       <p className="text-sm text-[#7E786E] leading-relaxed max-w-3xl">
         We use essential cookies to enable core functionality (e.g., security, network management). Optional analytics cookies help us improve our website by collecting and reporting information on its usage. These are disabled by default and only set if you choose “Accept all”. You can change your preference at any time.
@@ -18,6 +23,7 @@ export default function PrivacyPage() {
         </section>
       </div>
       {/* Global footer applied via RootLayout */}
-    </main>
+      </main>
+    </div>
   );
 }

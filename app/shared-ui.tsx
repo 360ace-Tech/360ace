@@ -95,7 +95,7 @@ export function Navbar({ logoRef, visible = true }: { logoRef?: React.RefObject<
               <span className="header-logo-text text-[#1C1917] text-xl leading-none whitespace-nowrap font-bold tracking-tighter">360ace.NET</span>
             </span>
           </Link>
-          <span className="ml-8 text-[10px] text-[#8F877B] font-mono tracking-widest uppercase leading-none">CONSULTANCY</span>
+          <span className="ml-8 text-xs text-[#1C1917] font-mono font-bold tracking-widest uppercase leading-none">CONSULTANCY</span>
         </div>
         <div className="hidden md:flex gap-8">
           {[
