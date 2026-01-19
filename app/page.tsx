@@ -353,10 +353,10 @@ function Hero({ ready }: { ready: boolean }) {
             })()}
           </p>
         </div>
-        <a href="/services" className="hero-fade group flex items-center gap-3 pointer-events-auto interactive mt-3 md:mt-0 md:ml-auto md:mr-0">
-          <div className="w-2 h-2 bg-[#1C1917] rounded-full animate-pulse" />
-          <span className="text-[10px] font-mono uppercase tracking-widest text-[#8F877B]">Find out More</span>
-          <ArrowRight className="text-[#8F877B] transition-transform duration-500 ease-out will-change-transform group-hover:rotate-[360deg]" />
+        <a href="/services" className="hero-fade group flex items-center gap-3 pointer-events-auto interactive mt-3 md:mt-0 md:ml-auto md:mr-0 px-4 py-2 border border-[#1C1917] rounded-full hover:bg-[#1C1917] hover:text-[#F9F7F2] transition-all duration-300">
+          <div className="w-2 h-2 bg-[#1C1917] group-hover:bg-[#F9F7F2] rounded-full animate-pulse transition-colors" />
+          <span className="text-xs font-semibold uppercase tracking-widest text-[#1C1917] group-hover:text-[#F9F7F2] transition-colors">Find out More</span>
+          <ArrowRight className="w-4 h-4 text-[#1C1917] group-hover:text-[#F9F7F2] transition-all duration-500 ease-out will-change-transform group-hover:rotate-[360deg]" />
         </a>
       </div>
     </section>

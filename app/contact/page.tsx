@@ -4,13 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { User, Mail, Building2, MessageSquareText, ChevronDown, Check, AlertCircle } from "lucide-react";
 import gsap from "gsap";
 import Script from "next/script";
-
-function CustomCursor(){
-  const c=useRef<HTMLDivElement|null>(null),f=useRef<HTMLDivElement|null>(null);
-  useEffect(()=>{const fine=window.matchMedia('(pointer: fine)').matches&&window.matchMedia('(hover: hover)').matches;if(!fine)return;const mv=(e:MouseEvent)=>{if(!c.current||!f.current)return;gsap.to(c.current,{x:e.clientX,y:e.clientY,duration:.1});gsap.to(f.current,{x:e.clientX,y:e.clientY,duration:.5,ease:"power2.out"})};addEventListener("mousemove",mv);return()=>removeEventListener("mousemove",mv)},[]);
-  return(<><div ref={c} className="hidden md:block fixed top-0 left-0 w-2 h-2 bg-[#1C1917] rounded-full pointer-events-none z-[100] -translate-x-1/2 -translate-y-1/2"/><div ref={f} className="hidden md:block fixed top-0 left-0 w-8 h-8 border border-[#D6D0C4] rounded-full pointer-events-none z-[99] -translate-x-1/2 -translate-y-1/2"/></>)}
-
-function GridLines(){return(<div className="fixed inset-0 w-full h-full pointer-events-none z-0 border-x border-[#E5E2D880] flex justify-between"><div className="h-full w-px bg-[#E5E2D84D] hidden md:block"/><div className="h-full w-px bg-[#E5E2D84D]"/><div className="h-full w-px bg-[#E5E2D84D] hidden md:block"/></div>)}
+import { CustomCursor, GridLines } from "../shared-ui";
 
 type FormState = {
   firstName: string;
