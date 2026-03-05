@@ -10,13 +10,11 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // Note: 'unsafe-inline' kept due to required inline scripts (e.g., structured data, GA). To fully harden, switch to per-request nonces.
-      // 'unsafe-eval' is only necessary for development source maps; omit in production via env guard below if desired.
-      `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV !== 'production' ? "'unsafe-eval' " : ''}https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com`,
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com",
       "font-src 'self' data:",
-      "connect-src 'self' https://challenges.cloudflare.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://cloudflareinsights.com",
+      "connect-src 'self' https://challenges.cloudflare.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com",
       "frame-src 'self' https://challenges.cloudflare.com",
       "frame-ancestors 'self'",
     ].join("; "),

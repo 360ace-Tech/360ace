@@ -41,23 +41,9 @@ export default function FoodPage() {
       // Set initial state immediately to prevent flash of unstyled content
       gsap.set(rows, { opacity: 1, y: 0 });
       rows.forEach((row, i) => {
-        gsap.fromTo(
-          row,
+        gsap.fromTo(row,
           { opacity: 0, y: 24 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: "power2.out",
-            delay: i * 0.06,
-            immediateRender: false,
-            scrollTrigger: {
-              trigger: row,
-              start: "top 95%",
-              once: true,
-              invalidateOnRefresh: true,
-            },
-          }
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: i * 0.06, scrollTrigger: { trigger: row, start: "top 95%", once: true } }
         );
       });
     }, ref);
