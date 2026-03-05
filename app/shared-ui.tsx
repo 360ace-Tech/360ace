@@ -91,7 +91,7 @@ export function Navbar({ logoRef, visible = true }: { logoRef?: React.RefObject<
         <div className="flex flex-col">
           <Link href="/" onClick={onNavClick} className="interactive">
             <span data-el="header-logo" ref={logoRef as React.RefObject<HTMLSpanElement>} className="header-logo inline-flex items-center gap-0 align-middle">
-              <Image src="/logo-dark.png" alt="360ace logo" width={120} height={32} className="h-8 w-auto select-none" />
+              <Image src="/logo-dark.png" alt="360ace logo" width={120} height={32} className="select-none" style={{ width: 'auto', height: 'auto' }} />
               <span className="header-logo-text text-[#1C1917] text-xl leading-none whitespace-nowrap font-bold tracking-tighter">360ace.NET</span>
             </span>
           </Link>

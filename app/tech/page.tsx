@@ -41,9 +41,24 @@ export default function TechPage() {
       // Set initial state immediately to prevent flash of unstyled content
       gsap.set(rows, { opacity: 1, y: 0 });
       rows.forEach((row, i) => {
-        gsap.fromTo(row,
+        gsap.fromTo(
+          row,
           { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: i * 0.06, scrollTrigger: { trigger: row, start: "top 95%", once: true } }
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            delay: i * 0.06,
+            // Prevent initial "from" styles from applying before the trigger
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: row,
+              start: "top 95%",
+              once: true,
+              invalidateOnRefresh: true,
+            },
+          }
         );
       });
     }, ref);

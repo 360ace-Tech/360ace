@@ -108,7 +108,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en" className="scroll-smooth no-scrollbar" suppressHydrationWarning>
+    <html lang="en" className="scroll-smooth no-scrollbar" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"

@@ -28,7 +28,9 @@ export default function GoogleAnalytics() {
   }, []);
 
   if (!GA_MEASUREMENT_ID) {
-    console.warn("[Analytics] Google Analytics ID not configured");
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn("[Analytics] Google Analytics ID not configured");
+    }
     return null;
   }
 
