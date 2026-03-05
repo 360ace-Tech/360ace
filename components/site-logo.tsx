@@ -10,7 +10,7 @@ const Logo = forwardRef<SVGSVGElement, LogoProps>(({ text = "360ace Technologies
   const WRITE_DUR = 0.2;   // faster: seconds to write each letter
   const FILL_DUR = 0.12;   // faster: seconds to fill
   return (
-    <svg ref={ref} viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" className="logo hw-svg" style={{ maxWidth: "520px", width: "60vw", overflow: "visible" }} {...props}>
+    <svg ref={ref} viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" className="logo hw-svg" style={{ overflow: "visible" }} {...props}>
       <rect x="0" y="0" width="600" height="220" fill="transparent" />
       <text x="300" y="110" textAnchor="middle" dominantBaseline="middle" fontSize="68" style={{ fontFamily: 'var(--font-hand), cursive' }}>
         {chars.map((ch, i) => {
