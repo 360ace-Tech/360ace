@@ -2,12 +2,9 @@
 
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "lucide-react";
 import data from "@/content/tech.json";
 import { CustomCursor, GridLines } from "../shared-ui";
-
-gsap.registerPlugin(ScrollTrigger);
 
 function ProjectItem({ title, category, index }: { title: string; category: string; index: number }) {
   return (
@@ -36,18 +33,43 @@ export default function TechPage() {
   const ref = useRef<HTMLDivElement | null>(null);
   const items = (data as TechData).items;
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const rows = gsap.utils.toArray<HTMLElement>(".project-row");
-      // Set initial state immediately to prevent flash of unstyled content
-      gsap.set(rows, { opacity: 1, y: 0 });
-      rows.forEach((row, i) => {
-        gsap.fromTo(row,
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: i * 0.06, scrollTrigger: { trigger: row, start: "top 95%", once: true } }
-        );
-      });
-    }, ref);
-    return () => ctx.revert();
+    let ctx: ReturnType<typeof gsap.context> | null = null;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let done = false;
+
+    const animate = () => {
+      if (done) return;
+      done = true;
+      ctx = gsap.context(() => {
+        const rows = gsap.utils.toArray<HTMLElement>(".project-row");
+        gsap.from(rows, {
+          opacity: 0,
+          y: 24,
+          duration: 0.6,
+          ease: "power2.out",
+          stagger: 0.06,
+          clearProps: "opacity,transform",
+        });
+      }, ref);
+    };
+
+    const onRevealed = () => {
+      if (timer) clearTimeout(timer);
+      animate();
+    };
+
+    // Animate after page:revealed (post-transition) or after 800ms fallback for direct loads
+    window.addEventListener("page:revealed", onRevealed, { once: true });
+    timer = setTimeout(() => {
+      window.removeEventListener("page:revealed", onRevealed);
+      animate();
+    }, 800);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener("page:revealed", onRevealed);
+      ctx?.revert();
+    };
   }, []);
 
   return (
