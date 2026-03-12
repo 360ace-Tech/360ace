@@ -38,12 +38,16 @@ export default function TechPage() {
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const rows = gsap.utils.toArray<HTMLElement>(".project-row");
-      // Set initial state immediately to prevent flash of unstyled content
       gsap.set(rows, { opacity: 1, y: 0 });
       rows.forEach((row, i) => {
-        gsap.fromTo(row,
+        const inView = row.getBoundingClientRect().top < window.innerHeight * 0.95;
+        gsap.fromTo(
+          row,
           { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: i * 0.06, scrollTrigger: { trigger: row, start: "top 95%", once: true } }
+          {
+            opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: i * 0.06,
+            ...(inView ? {} : { scrollTrigger: { trigger: row, start: "top 95%", once: true } }),
+          }
         );
       });
     }, ref);
