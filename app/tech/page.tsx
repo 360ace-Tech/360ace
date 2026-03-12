@@ -46,6 +46,9 @@ export default function TechPage() {
           { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: i * 0.06, scrollTrigger: { trigger: row, start: "top 95%", once: true } }
         );
       });
+      // On direct page loads ScrollTrigger never receives a scroll/resize event
+      // so it doesn't know items are already in the viewport. Force a refresh.
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     }, ref);
     return () => ctx.revert();
   }, []);
