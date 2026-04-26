@@ -22,6 +22,10 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
+const iconCacheHeaders = [
+  { key: "Cache-Control", value: "public, max-age=86400, must-revalidate" },
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
@@ -41,6 +45,22 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: "/favicon.ico",
+        headers: iconCacheHeaders,
+      },
+      {
+        source: "/icon.png",
+        headers: iconCacheHeaders,
+      },
+      {
+        source: "/apple-icon.png",
+        headers: iconCacheHeaders,
+      },
+      {
+        source: "/apple-touch-icon.png",
+        headers: iconCacheHeaders,
+      },
       {
         source: "/:path*",
         headers: securityHeaders,
