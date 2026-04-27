@@ -7,6 +7,7 @@ import CookieConsent from "@/components/cookie-consent";
 import GoogleAnalytics from "@/components/google-analytics";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://360ace.net";
+const iconVersion = "20260427-transparent";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -69,14 +70,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", sizes: "96x96", type: "image/png" },
+      { url: `/favicon.ico?v=${iconVersion}`, sizes: "any" },
+      { url: `/icon.png?v=${iconVersion}`, sizes: "96x96", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: `/apple-touch-icon.png?v=${iconVersion}`, sizes: "180x180", type: "image/png" }],
     other: [
-      { rel: "apple-touch-icon", url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
-      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+      { rel: "apple-touch-icon", url: `/apple-icon.png?v=${iconVersion}`, sizes: "180x180", type: "image/png" },
+      { url: `/android-chrome-192x192.png?v=${iconVersion}`, sizes: "192x192", type: "image/png" },
+      { url: `/android-chrome-512x512.png?v=${iconVersion}`, sizes: "512x512", type: "image/png" },
     ],
   },
   manifest: "/site.webmanifest",
